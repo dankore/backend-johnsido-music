@@ -2,11 +2,11 @@
   "name": "john-sido-music",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "db.js",
   "scripts": {
-    "start": "nodemon server/server",
+    "start": "nodemon db.js",
     "lint": "eslint server",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix ."
   },
   "repository": {
     "type": "git",
@@ -20,12 +20,15 @@
   },
   "homepage": "https://github.com/dankore/john-sido-music#readme",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-prettier": "^3.1.4",
     "express": "^4.17.1",
     "helmet": "^3.23.3",
     "husky": "^4.2.5",
+    "mongodb": "^3.6.0",
     "nodemon": "^2.0.4"
   },
   "devDependencies": {
