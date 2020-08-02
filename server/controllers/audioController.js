@@ -1,8 +1,10 @@
+require('dotenv').config();
 const multer = require('multer');
 const { Readable } = require('stream');
 const mongodb = require('mongodb');
+// const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
-const { db } = require('../server');
+const db = require('../../db').db();
 
 exports.apiGetAllAudio = (req, res) => {
   try {
