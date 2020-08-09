@@ -81,7 +81,7 @@ User.prototype.validate = function () {
 
       if (userDoc) {
         this.errors.push('That username is already taken.');
-        resolve();
+        resolve(); // NO NEED TO GO FURTHER
       }
     }
 
