@@ -1,13 +1,33 @@
 const User = require('../models/userModel');
+const jwt = require('jsonwebtoken');
 
-exports.homepage = (req, res) => {
-  let user = new User({ name: 'adamu' });
+exports.apiRegister = (req, res) => {
+  let user = new User(req.body);
+
   user
     .register()
-    .then(response => {
-      res.json(response);
+    .then(() => {
+      res.json({
+        token: jwt.sign(
+          {
+            _id: user.data._id,
+            username: user.data.username,
+            firstName: user.data.firstName,
+            lastName: user.data.lastName,
+            userCreationDate: user.data.userCreationDate,
+          },
+          process.env.JWTSECRET,
+          { expiresIn: '30d' }
+        ),
+        _id: user.data._id,
+        username: user.data.username,
+        firstName: user.data.firstName,
+        lastName: user.data.lastName,
+        avatar: user.avatar,
+        userCreationDate: user.data.userCreationDate,
+      });
     })
     .catch(error => {
-      console.log(error);
+      res.json(error);
     });
 };
