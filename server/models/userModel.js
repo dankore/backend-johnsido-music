@@ -25,6 +25,9 @@ User.prototype.cleanUp = function () {
   if (typeof this.data.password != 'string') {
     this.data.password = '';
   }
+  if (typeof this.data.confirmPassword != 'string') {
+    this.data.confirmPassword = '';
+  }
   // GET RID OF BOGUS PROPERTIES
   this.data = {
     username: this.data.username.trim().toLowerCase(),
@@ -34,6 +37,7 @@ User.prototype.cleanUp = function () {
     userCreationDate: this.data.userCreationDate,
     verified: false,
     password: this.data.password,
+    confirmPassword: this.data.confirmPassword,
   };
 };
 
@@ -59,6 +63,12 @@ User.prototype.validate = function () {
     }
     if (this.data.password.length > 0 && this.data.password.length < 6) {
       this.errors.push('Password must be at least 6 characters.');
+    }
+    if (this.data.confirmPassword == '') {
+      this.errors.push('Confirm password field is empty.');
+    }
+    if (this.data.confirmPassword.length != this.data.password.length) {
+      this.errors.push('Passwords do not match.');
     }
     if (this.data.password.length > 50) {
       this.errors.push('Password cannot exceed 50 characters.');
