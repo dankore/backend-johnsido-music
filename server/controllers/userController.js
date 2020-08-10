@@ -23,11 +23,22 @@ exports.apiRegister = (req, res) => {
         username: user.data.username,
         firstName: user.data.firstName,
         lastName: user.data.lastName,
-        avatar: user.avatar,
+        verified: false,
         userCreationDate: user.data.userCreationDate,
       });
     })
     .catch(error => {
       res.json(error);
     });
+};
+
+exports.apiDoesEmailExists = async (req, res) => {
+  try {
+    const response = await User.findByEmail(req.body.email);
+    console.log({ response });
+    res.json(response);
+  } catch (error) {
+    // FAIL SILENTLY
+    console.log(error);
+  }
 };

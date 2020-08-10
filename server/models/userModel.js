@@ -32,6 +32,7 @@ User.prototype.cleanUp = function () {
     lastName: this.data.lastName.trim(),
     email: this.data.email.trim().toLowerCase(),
     userCreationDate: this.data.userCreationDate,
+    verified: false,
     password: this.data.password,
   };
 };
@@ -120,4 +121,17 @@ User.prototype.register = function () {
   });
 };
 
+User.findByEmail = email => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await usersCollection.findOne({ email });
+
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+// EXPORT CODE
 module.exports = User;
