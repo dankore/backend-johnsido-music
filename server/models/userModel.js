@@ -37,7 +37,6 @@ User.prototype.cleanUp = function () {
     userCreationDate: this.data.userCreationDate,
     verified: false,
     password: this.data.password,
-    confirmPassword: this.data.confirmPassword,
   };
 };
 
@@ -113,8 +112,8 @@ User.prototype.validate = function () {
 User.prototype.register = function () {
   return new Promise(async (resolve, reject) => {
     // CLEAN / VALIDATE USER DATA
-    this.cleanUp();
     await this.validate();
+    this.cleanUp();
 
     if (!this.errors.length) {
       // HASH PASSWORD
