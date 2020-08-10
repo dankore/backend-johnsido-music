@@ -36,6 +36,8 @@ User.prototype.cleanUp = function () {
     email: this.data.email.trim().toLowerCase(),
     userCreationDate: this.data.userCreationDate,
     verified: false,
+    avatar:
+      'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
     password: this.data.password,
   };
 };
@@ -122,7 +124,6 @@ User.prototype.register = function () {
 
       // SAVE IN DB
       await usersCollection.insertOne(this.data);
-      // this.getAvatar();
       resolve('Success');
     } else {
       reject(this.errors);
