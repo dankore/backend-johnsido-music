@@ -42,3 +42,13 @@ exports.apiDoesEmailExists = async (req, res) => {
     console.log(error);
   }
 };
+exports.apiDoesUsernameExists = async (req, res) => {
+  try {
+    const response = await User.findByUsername(req.body.username);
+    // ONLY SEND A PROPERTY OF THE RESPONSE OBJECT. NO NEED TO SEND ALL OBJECT OVER THE WIRE
+    res.json(response?.email);
+  } catch (error) {
+    // FAIL SILENTLY
+    console.log(error);
+  }
+};

@@ -133,5 +133,17 @@ User.findByEmail = email => {
   });
 };
 
+User.findByUsername = username => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await usersCollection.findOne({ username });
+
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 // EXPORT CODE
 module.exports = User;
