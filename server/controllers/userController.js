@@ -35,8 +35,8 @@ exports.apiRegister = (req, res) => {
 exports.apiDoesEmailExists = async (req, res) => {
   try {
     const response = await User.findByEmail(req.body.email);
-    console.log({ response });
-    res.json(response);
+    // ONLY SEND A PROPERTY OF THE RESPONSE OBJECT. NO NEED TO SEND ALL OBJECT OVER THE WIRE
+    res.json(response?.email);
   } catch (error) {
     // FAIL SILENTLY
     console.log(error);
