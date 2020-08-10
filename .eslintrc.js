@@ -34,4 +34,5 @@ module.exports = {
     sourceType: 'module',
     allowImportExportEverywhere: true,
   },
+  parser: 'babel-eslint',
 };
