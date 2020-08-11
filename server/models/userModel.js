@@ -152,7 +152,17 @@ User.prototype.login = function () {
 User.findByEmail = email => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await usersCollection.findOne({ email });
+      let response = await usersCollection.findOne({ email });
+
+      // CLEAN UP
+      response = {
+        _id: response._id,
+        username: response.username,
+        firstName: response.firstName,
+        lastName: response.lastName,
+        avatar: response.avatar,
+        email: response.email,
+      };
 
       resolve(response);
     } catch (error) {
@@ -164,7 +174,17 @@ User.findByEmail = email => {
 User.findByUsername = username => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await usersCollection.findOne({ username });
+      let response = await usersCollection.findOne({ username });
+
+      // CLEAN UP
+      response = {
+        _id: response._id,
+        username: response.username,
+        firstName: response.firstName,
+        lastName: response.lastName,
+        email: response.email,
+        avatar: response.avatar,
+      };
 
       resolve(response);
     } catch (error) {
