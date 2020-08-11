@@ -24,6 +24,8 @@ exports.apiRegister = (req, res) => {
         firstName: user.data.firstName,
         lastName: user.data.lastName,
         verified: false,
+        avatar:
+          'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
         userCreationDate: user.data.userCreationDate,
       });
     })
