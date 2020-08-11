@@ -61,8 +61,8 @@ exports.apiLogin = (req, res) => {
         avatar: user.data.avatar,
       });
     })
-    .catch(() => {
-      res.json(false);
+    .catch(errors => {
+      res.json(errors);
     });
 };
 

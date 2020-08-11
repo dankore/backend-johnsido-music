@@ -131,21 +131,45 @@ User.prototype.register = function () {
   });
 };
 
+User.prototype.cleanUp_validate_login = function () {
+  if (this.data.username != 'string') {
+    this.data.username = '';
+  }
+  if (this.data.password != 'string') {
+    this.data.password = '';
+  }
+  if (this.data.username == '') {
+    this.errors.push('Username is empty.');
+  }
+  if (this.data.password == '') {
+    this.errors.push('Password is empty.');
+  }
+
+  this.data = {
+    username: this.data.username,
+    password: this.data.password,
+  };
+};
+
 User.prototype.login = function () {
-  return new Promise(async (resolve, reject) => {
-    usersCollection
-      .findOne({ username: this.data.username })
-      .then(attemptedUser => {
-        if (attemptedUser && bcrypt.compareSync(this.data.password, attemptedUser.password)) {
-          this.data = attemptedUser;
-          resolve();
-        } else {
-          reject('Invalid username / password');
-        }
-      })
-      .catch(() => {
-        reject();
-      });
+  return new Promise((resolve, reject) => {
+    if (!this.errors.length) {
+      usersCollection
+        .findOne({ username: this.data.username })
+        .then(attemptedUser => {
+          if (attemptedUser && bcrypt.compareSync(this.data.password, attemptedUser.password)) {
+            this.data = attemptedUser;
+            resolve();
+          } else {
+            reject('Invalid username / password');
+          }
+        })
+        .catch(() => {
+          reject();
+        });
+    } else {
+      reject(this.errors);
+    }
   });
 };
 
@@ -154,15 +178,17 @@ User.findByEmail = email => {
     try {
       let response = await usersCollection.findOne({ email });
 
-      // CLEAN UP
-      response = {
-        _id: response._id,
-        username: response.username,
-        firstName: response.firstName,
-        lastName: response.lastName,
-        avatar: response.avatar,
-        email: response.email,
-      };
+      if (response) {
+        // CLEAN UP
+        response = {
+          _id: response._id,
+          username: response.username,
+          firstName: response.firstName,
+          lastName: response.lastName,
+          avatar: response.avatar,
+          email: response.email,
+        };
+      }
 
       resolve(response);
     } catch (error) {
@@ -177,14 +203,16 @@ User.findByUsername = username => {
       let response = await usersCollection.findOne({ username });
 
       // CLEAN UP
-      response = {
-        _id: response._id,
-        username: response.username,
-        firstName: response.firstName,
-        lastName: response.lastName,
-        email: response.email,
-        avatar: response.avatar,
-      };
+      if (response) {
+        response = {
+          _id: response._id,
+          username: response.username,
+          firstName: response.firstName,
+          lastName: response.lastName,
+          email: response.email,
+          avatar: response.avatar,
+        };
+      }
 
       resolve(response);
     } catch (error) {
