@@ -131,6 +131,24 @@ User.prototype.register = function () {
   });
 };
 
+User.prototype.login = function () {
+  return new Promise(async (resolve, reject) => {
+    usersCollection
+      .findOne({ username: this.data.username })
+      .then(attemptedUser => {
+        if (attemptedUser && bcrypt.compareSync(this.data.password, attemptedUser.password)) {
+          this.data = attemptedUser;
+          resolve();
+        } else {
+          reject('Invalid username / password');
+        }
+      })
+      .catch(() => {
+        reject();
+      });
+  });
+};
+
 User.findByEmail = email => {
   return new Promise(async (resolve, reject) => {
     try {

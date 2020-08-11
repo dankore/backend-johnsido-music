@@ -7,4 +7,7 @@ apiRouter.post('/register', userController.apiRegister);
 apiRouter.post('/doesEmailExists', userController.apiDoesEmailExists);
 apiRouter.post('/doesUsernameExists', userController.apiDoesUsernameExists);
 
+// AUTH
+apiRouter.post('/login', userController.apiLogin);
+
 module.exports = apiRouter;

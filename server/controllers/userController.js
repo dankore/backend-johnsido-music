@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const tokenLasts = '30d';
 
 exports.apiRegister = (req, res) => {
   let user = new User(req.body);
@@ -17,7 +18,7 @@ exports.apiRegister = (req, res) => {
             userCreationDate: user.data.userCreationDate,
           },
           process.env.JWTSECRET,
-          { expiresIn: '30d' }
+          { expiresIn: tokenLasts }
         ),
         _id: user.data._id,
         username: user.data.username,
@@ -31,6 +32,37 @@ exports.apiRegister = (req, res) => {
     })
     .catch(error => {
       res.json(error);
+    });
+};
+
+exports.apiLogin = (req, res) => {
+  let user = new User(req.body);
+
+  user
+    .login()
+    .then(() => {
+      res.json({
+        token: jwt.sign(
+          {
+            _id: user.data._id,
+            username: user.data.username,
+            firstName: user.data.firstName,
+            lastName: user.data.lastName,
+            userCreationDate: user.data.userCreationDate,
+          },
+          process.env.JWTSECRET,
+          { expiresIn: tokenLasts }
+        ),
+        _id: user.data._id,
+        username: user.data.username,
+        firstName: user.data.firstName,
+        lastName: user.data.lastName,
+        userCreationDate: user.data.userCreationDate,
+        avatar: user.data.avatar,
+      });
+    })
+    .catch(() => {
+      res.json(false);
     });
 };
 
