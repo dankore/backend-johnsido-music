@@ -163,7 +163,7 @@ User.prototype.login = function () {
             this.data = attemptedUser;
             resolve();
           } else {
-            reject('Invalid username / password');
+            reject(['Invalid username / password']);
           }
         })
         .catch(() => {
