@@ -132,10 +132,10 @@ User.prototype.register = function () {
 };
 
 User.prototype.cleanUp_validate_login = function () {
-  if (this.data.username != 'string') {
+  if (typeof this.data.username != 'string') {
     this.data.username = '';
   }
-  if (this.data.password != 'string') {
+  if (typeof this.data.password != 'string') {
     this.data.password = '';
   }
   if (this.data.username == '') {
@@ -153,6 +153,8 @@ User.prototype.cleanUp_validate_login = function () {
 
 User.prototype.login = function () {
   return new Promise((resolve, reject) => {
+    this.cleanUp_validate_login();
+
     if (!this.errors.length) {
       usersCollection
         .findOne({ username: this.data.username })
