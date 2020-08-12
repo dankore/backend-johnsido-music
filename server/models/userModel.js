@@ -36,6 +36,11 @@ User.prototype.cleanUp = function () {
     email: this.data.email.trim().toLowerCase(),
     userCreationDate: this.data.userCreationDate,
     verified: false,
+    about: {
+      bio: '',
+      city: '',
+      musicCategory: '',
+    },
     avatar:
       'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
     password: this.data.password,
@@ -124,7 +129,7 @@ User.prototype.register = function () {
 
       // SAVE IN DB
       await usersCollection.insertOne(this.data);
-      resolve('Success');
+      resolve();
     } else {
       reject(this.errors);
     }
@@ -189,6 +194,7 @@ User.findByEmail = email => {
           lastName: response.lastName,
           avatar: response.avatar,
           email: response.email,
+          about: response.about,
         };
       }
 
@@ -213,6 +219,7 @@ User.findByUsername = username => {
           lastName: response.lastName,
           email: response.email,
           avatar: response.avatar,
+          about: response.about,
         };
       }
 

@@ -25,6 +25,11 @@ exports.apiRegister = (req, res) => {
         firstName: user.data.firstName,
         lastName: user.data.lastName,
         verified: false,
+        about: {
+          bio: 'Adamu Is cool',
+          city: 'Abuja',
+          musicCategory: 'Blues',
+        },
         avatar:
           'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
         userCreationDate: user.data.userCreationDate,
@@ -59,6 +64,11 @@ exports.apiLogin = (req, res) => {
         lastName: user.data.lastName,
         userCreationDate: user.data.userCreationDate,
         avatar: user.data.avatar,
+        about: {
+          bio: '',
+          city: '',
+          musicCategory: '',
+        },
       });
     })
     .catch(errors => {
@@ -104,6 +114,7 @@ exports.profileBasicData = (req, res) => {
       profileLastName: req.profileUser.lastName,
       profileEmail: req.profileUser.email,
       profileAvatar: req.profileUser.avatar,
+      profileAbout: req.profileUser.about,
     });
   } else {
     res.json(false);
