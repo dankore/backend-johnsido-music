@@ -10,4 +10,11 @@ apiRouter.post('/doesUsernameExists', userController.apiDoesUsernameExists);
 // AUTH
 apiRouter.post('/login', userController.apiLogin);
 
+// PROFILE
+apiRouter.post(
+  '/profile/:username',
+  userController.isUserRegistered,
+  userController.profileBasicData
+);
+
 module.exports = apiRouter;

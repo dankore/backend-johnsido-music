@@ -86,3 +86,26 @@ exports.apiDoesUsernameExists = async (req, res) => {
     console.log(error);
   }
 };
+exports.isUserRegistered = (req, res, next) => {
+  User.findByUsername(req.params.username)
+    .then(userDoc => {
+      req.profileUser = userDoc;
+      next();
+    })
+    .catch(error => {
+      res.json(error);
+    });
+};
+exports.profileBasicData = (req, res) => {
+  if (req.profileUser) {
+    res.json({
+      profileUsername: req.profileUser.username,
+      profileFirstName: req.profileUser.firstName,
+      profileLastName: req.profileUser.lastName,
+      profileEmail: req.profileUser.email,
+      profileAvatar: req.profileUser.avatar,
+    });
+  } else {
+    res.json(false);
+  }
+};
