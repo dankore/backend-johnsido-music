@@ -13,7 +13,7 @@ apiRouter.post('/login', userController.apiLogin);
 // PROFILE
 apiRouter.post(
   '/profile/:username',
-  userController.isUserRegistered,
+  userController.apiIsUserRegistered,
   userController.profileBasicData
 );
 

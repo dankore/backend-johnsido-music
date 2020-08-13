@@ -26,9 +26,9 @@ exports.apiRegister = (req, res) => {
         lastName: user.data.lastName,
         verified: false,
         about: {
-          bio: 'Adamu Is cool',
-          city: 'Abuja',
-          musicCategory: 'Blues',
+          bio: '',
+          city: '',
+          musicCategory: '',
         },
         avatar:
           'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
@@ -96,7 +96,7 @@ exports.apiDoesUsernameExists = async (req, res) => {
     console.log(error);
   }
 };
-exports.isUserRegistered = (req, res, next) => {
+exports.apiIsUserRegistered = (req, res, next) => {
   User.findByUsername(req.params.username)
     .then(userDoc => {
       req.profileUser = userDoc;
