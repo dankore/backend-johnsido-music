@@ -71,8 +71,10 @@ User.prototype.validate = function (type) {
     if (this.data?.lastName == '') {
       this.errors.push('You must provide a last name.');
     }
-    if (!validator.isEmail(this.data?.email)) {
-      this.errors.push('You must provide a valid email address.');
+    if (this.data?.email) {
+      if (!validator.isEmail(this.data?.email)) {
+        this.errors.push('You must provide a valid email address.');
+      }
     }
     if (this.data?.password == '') {
       this.errors.push('You must provide a password.');
@@ -83,8 +85,10 @@ User.prototype.validate = function (type) {
     if (this.data?.confirmPassword == '') {
       this.errors.push('Confirm password field is empty.');
     }
-    if (this.data?.confirmPassword?.length != this.data?.password?.length) {
-      this.errors.push('Passwords do not match.');
+    if (this.data?.confirmPassword) {
+      if (this.data?.confirmPassword?.length != this.data?.password?.length) {
+        this.errors.push('Passwords do not match.');
+      }
     }
     if (this.data?.password?.length > 50) {
       this.errors.push('Password cannot exceed 50 characters.');
@@ -170,7 +174,7 @@ User.prototype.cleanUp_validate_login = function () {
 
 User.prototype.login = function () {
   return new Promise((resolve, reject) => {
-    this.cleanUp_validate_login();
+    this.validate();
 
     if (!this.errors.length) {
       usersCollection
