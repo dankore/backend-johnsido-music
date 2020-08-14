@@ -23,19 +23,22 @@ User.prototype.cleanUp = function (type) {
   if (typeof this.data.lastName != 'string') {
     this.data.lastName = '';
   }
-  if (typeof this.data.password != 'string') {
+  if (typeof this.data?.password != 'string') {
     this.data.password = '';
   }
-  if (typeof this.data.confirmPassword != 'string') {
+  if (typeof this.data?.confirmPassword != 'string') {
     this.data.confirmPassword = '';
   }
-  // GET RID OF BOGUS PROPERTIES
+  // GET RID OF BOGUS PROPERTIES with
   this.data = {
+    ...(type == 'updateInfo' && { _id: this.data._id }),
     username: this.data.username.trim().toLowerCase(),
     firstName: this.data.firstName.trim(),
     lastName: this.data.lastName.trim(),
     email: this.data.email.trim().toLowerCase(),
-    userCreationDate: this.data.userCreationDate,
+    ...(type == 'register' && {
+      userCreationDate: this.data.userCreationDate,
+    }),
     ...(type == 'register' && {
       verified: false,
     }),
@@ -242,6 +245,7 @@ User.findByUsername = username => {
 User.prototype.saveUpdatedProfileInfo = function () {
   return new Promise(async (resolve, reject) => {
     await this.validate('updateInfo');
+    this.cleanUp('updateInfo');
 
     if (!this.errors.length) {
       usersCollection.findOneAndUpdate(
