@@ -2,6 +2,7 @@
 const usersCollection = require('../../db').db().collection('users');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const { ObjectID } = require('mongodb');
 let User = class user {
   constructor(data) {
     this.data = data;
@@ -234,7 +235,7 @@ User.prototype.saveUpdatedProfileInfo = function () {
   return new Promise((resolve, reject) => {
     if (!this.errors.length) {
       usersCollection.findOneAndUpdate(
-        { username: this.data.username },
+        { _id: new ObjectID(this.data._id) },
         {
           $set: {
             username: this.data.username,

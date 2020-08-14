@@ -124,6 +124,7 @@ exports.profileBasicData = (req, res) => {
 exports.isLoggedIn = (req, res, next) => {
   try {
     req.apiUser = jwt.verify(req.body.token, process.env.JWTSECRET);
+
     next();
   } catch (error) {
     res.status(500).send('In order to perform this operation, you need to log in.');
@@ -131,7 +132,8 @@ exports.isLoggedIn = (req, res, next) => {
 };
 
 exports.apiSaveUpdatedProfileInfo = (req, res) => {
-  let user = new User(req.body);
+  req.body.userData._id = req.apiUser._id;
+  let user = new User(req.body.userData);
 
   user
     .saveUpdatedProfileInfo()
