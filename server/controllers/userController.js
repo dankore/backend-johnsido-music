@@ -120,3 +120,37 @@ exports.profileBasicData = (req, res) => {
     res.json(false);
   }
 };
+
+exports.isLoggedIn = (req, res, next) => {
+  try {
+    req.apiUser = jwt.verify(req.body.token, process.env.JWTSECRET);
+    next();
+  } catch (error) {
+    res.status(500).send('In order to perform this operation, you need to log in.');
+  }
+};
+
+exports.apiSaveUpdatedProfileInfo = (req, res) => {
+  let user = new User(req.body);
+
+  user
+    .saveUpdatedProfileInfo()
+    .then(() => {
+      res.json({
+        token: jwt.sign(
+          {
+            _id: req.apiUser._id,
+            username: user.data.username,
+            firstName: user.data.firstName,
+            lastName: user.data.lastName,
+            userCreationDate: user.data.userCreationDate,
+          },
+          process.env.JWTSECRET,
+          { expiresIn: tokenLasts }
+        ),
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    });
+};

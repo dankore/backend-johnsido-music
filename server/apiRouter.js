@@ -10,6 +10,12 @@ apiRouter.post('/doesUsernameExists', userController.apiDoesUsernameExists);
 // AUTH
 apiRouter.post('/login', userController.apiLogin);
 
+// SETTINGS
+apiRouter.post(
+  '/saveUpdatedProfileInfo',
+  userController.isLoggedIn,
+  userController.apiSaveUpdatedProfileInfo
+);
 // PROFILE
 apiRouter.post(
   '/profile/:username',

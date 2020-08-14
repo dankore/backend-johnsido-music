@@ -230,5 +230,32 @@ User.findByUsername = username => {
   });
 };
 
+User.prototype.saveUpdatedProfileInfo = function () {
+  return new Promise((resolve, reject) => {
+    if (!this.errors.length) {
+      usersCollection.findOneAndUpdate(
+        { username: this.data.username },
+        {
+          $set: {
+            username: this.data.username,
+            firstName: this.data.firstName,
+            lastName: this.data.lastName,
+            email: this.data.email,
+            about: {
+              bio: this.data.about.bio,
+              city: this.data.about.city,
+              musicCategory: this.data.about.musicCategory,
+            },
+          },
+        }
+      );
+      // SUCCESS
+      resolve();
+    } else {
+      reject(this.errors);
+    }
+  });
+};
+
 // EXPORT CODE
 module.exports = User;
