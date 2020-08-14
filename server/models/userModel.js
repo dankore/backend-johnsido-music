@@ -36,11 +36,13 @@ User.prototype.cleanUp = function (type) {
     lastName: this.data.lastName.trim(),
     email: this.data.email.trim().toLowerCase(),
     userCreationDate: this.data.userCreationDate,
-    verified: false,
+    ...(type == 'register' && {
+      verified: false,
+    }),
     about: {
-      bio: '',
-      city: '',
-      musicCategory: '',
+      bio: this.data.about?.bio ? this.data.about.bio : '',
+      city: this.data.about?.city ? this.data.about.city : '',
+      musicCategory: this.data.about?.musicCategory ? this.data.about.musicCategory : '',
     },
     ...(type == 'register' && {
       avatar:
