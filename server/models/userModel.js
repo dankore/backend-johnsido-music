@@ -10,7 +10,7 @@ let User = class user {
   }
 };
 
-User.prototype.cleanUp = function () {
+User.prototype.cleanUp = function (type) {
   if (typeof this.data.username != 'string') {
     this.data.username = '';
   }
@@ -42,9 +42,13 @@ User.prototype.cleanUp = function () {
       city: '',
       musicCategory: '',
     },
-    avatar:
-      'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
-    password: this.data.password,
+    ...(type == 'register' && {
+      avatar:
+        'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
+    }),
+    ...(type == 'register' && {
+      password: this.data.password,
+    }),
   };
 };
 
@@ -123,7 +127,7 @@ User.prototype.register = function () {
   return new Promise(async (resolve, reject) => {
     // CLEAN / VALIDATE USER DATA
     await this.validate('register');
-    this.cleanUp();
+    this.cleanUp('register');
 
     if (!this.errors.length) {
       // HASH PASSWORD
