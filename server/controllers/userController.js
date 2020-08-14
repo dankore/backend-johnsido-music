@@ -64,10 +64,11 @@ exports.apiLogin = (req, res) => {
         lastName: user.data.lastName,
         userCreationDate: user.data.userCreationDate,
         avatar: user.data.avatar,
+        verified: user.data.verified,
         about: {
-          bio: '',
-          city: '',
-          musicCategory: '',
+          bio: user.data.about.bio,
+          city: user.data.about.city,
+          musicCategory: user.data.about.musicCategory,
         },
       });
     })
