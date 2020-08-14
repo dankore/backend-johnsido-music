@@ -48,42 +48,42 @@ User.prototype.cleanUp = function () {
   };
 };
 
-User.prototype.validate = function () {
+User.prototype.validate = function (type) {
   return new Promise(async resolve => {
-    if (this.data.username == '') {
+    if (this.data?.username == '') {
       this.errors.push('You must provide a username.');
     }
-    if (this.data.username != '' && !validator.isAlphanumeric(this.data.username)) {
+    if (this.data?.username != '' && !validator.isAlphanumeric(this.data?.username)) {
       this.errors.push('Username can only contain letters and numbers.');
     }
-    if (this.data.firstName == '') {
+    if (this.data?.firstName == '') {
       this.errors.push('You must provide a first name.');
     }
-    if (this.data.lastName == '') {
+    if (this.data?.lastName == '') {
       this.errors.push('You must provide a last name.');
     }
-    if (!validator.isEmail(this.data.email)) {
+    if (!validator.isEmail(this.data?.email)) {
       this.errors.push('You must provide a valid email address.');
     }
-    if (this.data.password == '') {
+    if (this.data?.password == '') {
       this.errors.push('You must provide a password.');
     }
-    if (this.data.password.length > 0 && this.data.password.length < 6) {
+    if (this.data?.password?.length > 0 && this.data?.password?.length < 6) {
       this.errors.push('Password must be at least 6 characters.');
     }
-    if (this.data.confirmPassword == '') {
+    if (this.data?.confirmPassword == '') {
       this.errors.push('Confirm password field is empty.');
     }
-    if (this.data.confirmPassword.length != this.data.password.length) {
+    if (this.data?.confirmPassword?.length != this.data?.password?.length) {
       this.errors.push('Passwords do not match.');
     }
-    if (this.data.password.length > 50) {
+    if (this.data?.password?.length > 50) {
       this.errors.push('Password cannot exceed 50 characters.');
     }
-    if (this.data.username.length > 0 && this.data.username.length < 3) {
+    if (this.data?.username.length > 0 && this.data?.username.length < 3) {
       this.errors.push('Username must be at least 3 characters.');
     }
-    if (this.data.username.length > 30) {
+    if (this.data?.username.length > 30) {
       this.errors.push('Username cannot exceed 30 characters.');
     }
 
@@ -97,20 +97,22 @@ User.prototype.validate = function () {
         username: this.data.username,
       });
 
-      if (userDoc) {
+      if (userDoc && type == 'register') {
         this.errors.push('That username is already taken.');
         resolve(); // NO NEED TO GO FURTHER
       }
     }
 
     // Only if email is valid then check to see if it's already taken
-    if (validator.isEmail(this.data.email)) {
-      const userDoc = await usersCollection.findOne({
-        email: this.data.email,
-      });
+    if (type == 'register') {
+      if (validator.isEmail(this.data.email)) {
+        const userDoc = await usersCollection.findOne({
+          email: this.data.email,
+        });
 
-      if (userDoc) {
-        this.errors.push('That email is already being used.');
+        if (userDoc) {
+          this.errors.push('That email is already being used.');
+        }
       }
     }
     resolve();
@@ -120,7 +122,7 @@ User.prototype.validate = function () {
 User.prototype.register = function () {
   return new Promise(async (resolve, reject) => {
     // CLEAN / VALIDATE USER DATA
-    await this.validate();
+    await this.validate('register');
     this.cleanUp();
 
     if (!this.errors.length) {
@@ -232,7 +234,9 @@ User.findByUsername = username => {
 };
 
 User.prototype.saveUpdatedProfileInfo = function () {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
+    await this.validate('updateInfo');
+
     if (!this.errors.length) {
       usersCollection.findOneAndUpdate(
         { _id: new ObjectID(this.data._id) },
@@ -253,6 +257,8 @@ User.prototype.saveUpdatedProfileInfo = function () {
       // SUCCESS
       resolve();
     } else {
+      console.log(this.errors);
+
       reject(this.errors);
     }
   });

@@ -153,6 +153,6 @@ exports.apiSaveUpdatedProfileInfo = (req, res) => {
       });
     })
     .catch(error => {
-      console.log(error);
+      res.json(error);
     });
 };
