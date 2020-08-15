@@ -271,8 +271,6 @@ User.prototype.saveUpdatedProfileInfo = function () {
       // SUCCESS
       resolve();
     } else {
-      console.log(this.errors);
-
       reject(this.errors);
     }
   });
