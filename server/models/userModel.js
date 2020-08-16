@@ -134,6 +134,15 @@ User.prototype.validate = function (type) {
         }
       }
     }
+
+    // CHANGE PASSWORD: CHECK IF CURRENT PASSWORD IS THE SAME AS ENTERED PASSWORD
+    if (type == 'changePassword') {
+      const userDoc = await usersCollection.findOne({ _id: new ObjectID(this.data._id) });
+
+      if (!(userDoc && bcrypt.compareSync(this.data.currentPassword, userDoc.password))) {
+        this.errors.push('Current password is invalid.');
+      }
+    }
     resolve();
   });
 };
@@ -263,23 +272,22 @@ User.prototype.saveUpdatedProfileInfo = function () {
 };
 
 User.prototype.changePassword = function () {
-  return new Promise((resolve, reject) => {
-    // CLEAN UP / VALIDATION
-    if (this.data.newPassword != this.data.reEnteredNewPassword) {
-      this.errors.push('Passwords do not match.');
-    }
+  return new Promise(async (resolve, reject) => {
+    // VALIDATION
+    await this.validate('changePassword');
+    console.log(this.data);
 
     if (!this.errors.length) {
       // HASH NEW PASSWORD
       const salt = bcrypt.genSaltSync();
-      this.data.newPassword = bcrypt.hashSync(this.data.newPassword, salt);
+      this.data.password = bcrypt.hashSync(this.data.password, salt);
 
       usersCollection
         .findOneAndUpdate(
           { _id: new ObjectID(this.data._id) },
           {
             $set: {
-              password: this.data.newPassword,
+              password: this.data.password,
             },
           }
         )
