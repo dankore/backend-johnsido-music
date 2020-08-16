@@ -157,3 +157,17 @@ exports.apiSaveUpdatedProfileInfo = (req, res) => {
       res.json(error);
     });
 };
+
+exports.apiChangePassword = (req, res) => {
+  let user = new User(req.body);
+
+  user
+    .changePassword()
+    .then(response => {
+      // SUCCESS
+      res.json(response);
+    })
+    .catch(errors => {
+      res.json(errors);
+    });
+};

@@ -276,5 +276,32 @@ User.prototype.saveUpdatedProfileInfo = function () {
   });
 };
 
+User.prototype.changePassword = function () {
+  return new Promise((resolve, reject) => {
+    // CLEAN UP/VALIDATION
+    if (!this.errors.length) {
+      usersCollection
+        .findOneAndUpdate(
+          { username: this.data.username },
+          {
+            $set: {
+              password: this.data.newPassword,
+            },
+          }
+        )
+        .then(() => {
+          // SUCCESS
+        })
+        .catch(error => {
+          // NETWORK ERRORS
+          reject(error);
+        });
+    } else {
+      // VALIDATION ERRORS
+      reject(this.errors);
+    }
+  });
+};
+
 // EXPORT CODE
 module.exports = User;
