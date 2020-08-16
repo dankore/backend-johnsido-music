@@ -159,6 +159,7 @@ exports.apiSaveUpdatedProfileInfo = (req, res) => {
 };
 
 exports.apiChangePassword = (req, res) => {
+  req.body._id = req.apiUser._id; // ATTACH _ID TO BODY. THIS IS USED TO FIND A USER.
   let user = new User(req.body);
 
   user

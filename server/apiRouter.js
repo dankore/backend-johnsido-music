@@ -16,11 +16,7 @@ apiRouter.post(
   userController.isLoggedIn,
   userController.apiSaveUpdatedProfileInfo
 );
-apiRouter.post(
-  '/change-password',
-  userController.apiIsUserRegistered,
-  userController.apiChangePassword
-);
+apiRouter.post('/change-password', userController.isLoggedIn, userController.apiChangePassword);
 // PROFILE
 apiRouter.post(
   '/profile/:username',

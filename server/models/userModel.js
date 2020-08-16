@@ -279,10 +279,18 @@ User.prototype.saveUpdatedProfileInfo = function () {
 User.prototype.changePassword = function () {
   return new Promise((resolve, reject) => {
     // CLEAN UP/VALIDATION
+    if (this.data.newPassword != this.data.reEnteredNewPassword) {
+      this.errors.push('Passwords do not match.');
+    }
+
     if (!this.errors.length) {
+      // HASH NEW PASSWORD
+      const salt = bcrypt.genSaltSync();
+      this.data.newPassword = bcrypt.hashSync(this.data.newPassword, salt);
+
       usersCollection
         .findOneAndUpdate(
-          { username: this.data.username },
+          { _id: new ObjectID(this.data._id) },
           {
             $set: {
               password: this.data.newPassword,
@@ -291,6 +299,7 @@ User.prototype.changePassword = function () {
         )
         .then(() => {
           // SUCCESS
+          resolve('Success');
         })
         .catch(error => {
           // NETWORK ERRORS
