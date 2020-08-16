@@ -43,12 +43,10 @@ User.prototype.cleanUp = function (type) {
       verified: false,
     }),
     about: {
-      bio: this.data.about.bio && this.data.about.bio ? this.data.about.bio : '',
-      city: this.data.about.city && this.data.about.city ? this.data.about.city : '',
+      bio: this.data.about && this.data.about.bio ? this.data.about.bio : '',
+      city: this.data.about && this.data.about.city ? this.data.about.city : '',
       musicCategory:
-        this.data.about.musicCategory && this.data.about.musicCategory
-          ? this.data.about.musicCategory
-          : '',
+        this.data.about && this.data.about.musicCategory ? this.data.about.musicCategory : '',
     },
     ...(type == 'register' && {
       avatar:
