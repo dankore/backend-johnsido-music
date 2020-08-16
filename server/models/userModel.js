@@ -23,10 +23,10 @@ User.prototype.cleanUp = function (type) {
   if (typeof this.data.lastName != 'string') {
     this.data.lastName = '';
   }
-  if (typeof this.data?.password != 'string') {
+  if (this.data.password && typeof this.data.password != 'string') {
     this.data.password = '';
   }
-  if (typeof this.data?.confirmPassword != 'string') {
+  if (this.data.confirmPassword && typeof this.data.confirmPassword != 'string') {
     this.data.confirmPassword = '';
   }
   // GET RID OF BOGUS PROPERTIES with
@@ -43,9 +43,10 @@ User.prototype.cleanUp = function (type) {
       verified: false,
     }),
     about: {
-      bio: this.data.about?.bio ? this.data.about.bio : '',
-      city: this.data.about?.city ? this.data.about.city : '',
-      musicCategory: this.data.about?.musicCategory ? this.data.about.musicCategory : '',
+      bio: this.data.about && this.data.about.bio ? this.data.about.bio : '',
+      city: this.data.about && this.data.about.city ? this.data.about.city : '',
+      musicCategory:
+        this.data.about && this.data.about.musicCategory ? this.data.about.musicCategory : '',
     },
     ...(type == 'register' && {
       avatar:
@@ -59,49 +60,54 @@ User.prototype.cleanUp = function (type) {
 
 User.prototype.validate = function (type) {
   return new Promise(async resolve => {
-    if (this.data?.username == '') {
+    if (this.data.username && this.data.username == '') {
       this.errors.push('You must provide a username.');
     }
-    if (this.data?.username != '' && !validator.isAlphanumeric(this.data?.username)) {
+    if (
+      this.data.username &&
+      this.data.username != '' &&
+      !validator.isAlphanumeric(this.data.username)
+    ) {
       this.errors.push('Username can only contain letters and numbers.');
     }
-    if (this.data?.firstName == '') {
+    if (this.data.firstName && this.data.firstName == '') {
       this.errors.push('You must provide a first name.');
     }
-    if (this.data?.lastName == '') {
+    if (this.data.lastName && this.data.lastName == '') {
       this.errors.push('You must provide a last name.');
     }
-    if (this.data?.email) {
-      if (!validator.isEmail(this.data?.email)) {
+    if (this.data.email) {
+      if (!validator.isEmail(this.data.email)) {
         this.errors.push('You must provide a valid email address.');
       }
     }
-    if (this.data?.password == '') {
+    if (this.data.password && this.data.password == '') {
       this.errors.push('You must provide a password.');
     }
-    if (this.data?.password?.length > 0 && this.data?.password?.length < 6) {
+    if (this.data.password && this.data.password.length > 0 && this.data.password.length < 6) {
       this.errors.push('Password must be at least 6 characters.');
     }
-    if (this.data?.confirmPassword == '') {
+    if (this.data.confirmPassword && this.data.confirmPassword == '') {
       this.errors.push('Confirm password field is empty.');
     }
-    if (this.data?.confirmPassword) {
-      if (this.data?.confirmPassword?.length != this.data?.password?.length) {
+    if (this.data.confirmPassword) {
+      if (this.data.confirmPassword.length != this.data.password.length) {
         this.errors.push('Passwords do not match.');
       }
     }
-    if (this.data?.password?.length > 50) {
+    if (this.data.password && this.data.password.length > 50) {
       this.errors.push('Password cannot exceed 50 characters.');
     }
-    if (this.data?.username.length > 0 && this.data?.username.length < 3) {
+    if (this.data.username && this.data.username.length > 0 && this.data.username.length < 3) {
       this.errors.push('Username must be at least 3 characters.');
     }
-    if (this.data?.username.length > 30) {
+    if (this.data.username && this.data.username.length > 30) {
       this.errors.push('Username cannot exceed 30 characters.');
     }
 
     // Only if username is valid then check to see if it's already taken
     if (
+      this.data.username &&
       this.data.username.length > 2 &&
       this.data.username.length < 31 &&
       validator.isAlphanumeric(this.data.username)
@@ -118,7 +124,7 @@ User.prototype.validate = function (type) {
 
     // Only if email is valid then check to see if it's already taken
     if (type == 'register') {
-      if (validator.isEmail(this.data.email)) {
+      if (this.data.email && validator.isEmail(this.data.email)) {
         const userDoc = await usersCollection.findOne({
           email: this.data.email,
         });
@@ -152,29 +158,9 @@ User.prototype.register = function () {
   });
 };
 
-User.prototype.cleanUp_validate_login = function () {
-  if (typeof this.data.username != 'string') {
-    this.data.username = '';
-  }
-  if (typeof this.data.password != 'string') {
-    this.data.password = '';
-  }
-  if (this.data.username == '') {
-    this.errors.push('Username is empty.');
-  }
-  if (this.data.password == '') {
-    this.errors.push('Password is empty.');
-  }
-
-  this.data = {
-    username: this.data.username,
-    password: this.data.password,
-  };
-};
-
 User.prototype.login = function () {
-  return new Promise((resolve, reject) => {
-    this.validate();
+  return new Promise(async (resolve, reject) => {
+    await this.validate();
 
     if (!this.errors.length) {
       usersCollection
@@ -271,6 +257,42 @@ User.prototype.saveUpdatedProfileInfo = function () {
       // SUCCESS
       resolve();
     } else {
+      reject(this.errors);
+    }
+  });
+};
+
+User.prototype.changePassword = function () {
+  return new Promise((resolve, reject) => {
+    // CLEAN UP / VALIDATION
+    if (this.data.newPassword != this.data.reEnteredNewPassword) {
+      this.errors.push('Passwords do not match.');
+    }
+
+    if (!this.errors.length) {
+      // HASH NEW PASSWORD
+      const salt = bcrypt.genSaltSync();
+      this.data.newPassword = bcrypt.hashSync(this.data.newPassword, salt);
+
+      usersCollection
+        .findOneAndUpdate(
+          { _id: new ObjectID(this.data._id) },
+          {
+            $set: {
+              password: this.data.newPassword,
+            },
+          }
+        )
+        .then(() => {
+          // SUCCESS
+          resolve('Success');
+        })
+        .catch(error => {
+          // NETWORK ERRORS
+          reject(error);
+        });
+    } else {
+      // VALIDATION ERRORS
       reject(this.errors);
     }
   });
