@@ -52,9 +52,11 @@ User.prototype.cleanUp = function (type) {
       avatar:
         'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
     }),
-    ...(type == 'register' && {
-      password: this.data.password,
-    }),
+    ...(type == 'register' ||
+      (type == 'changePassword' && {
+        password: this.data.password,
+      })),
+    ...(type == 'changePassword' && { _id: this.data._id }),
   };
 };
 
@@ -275,7 +277,7 @@ User.prototype.changePassword = function () {
   return new Promise(async (resolve, reject) => {
     // VALIDATION
     await this.validate('changePassword');
-    console.log(this.data);
+    this.cleanUp('changePassword');
 
     if (!this.errors.length) {
       // HASH NEW PASSWORD
