@@ -3,6 +3,9 @@ const usersCollection = require('../../db').db().collection('users');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { ObjectID } = require('mongodb');
+const sanitizeHTML = require('sanitize-html');
+
+// CLASS
 let User = class user {
   constructor(data) {
     this.data = data;
@@ -33,21 +36,27 @@ User.prototype.cleanUp = function (type) {
   switch (type) {
     case 'login':
       this.data = {
-        username: this.data.username.trim().toLowerCase(),
-        password: this.data.password,
+        username: sanitizeHTML(this.data.username.trim().toLowerCase(), {
+          allowedTags: [],
+          allowedAttributes: {},
+        }),
+        password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
       };
       break;
     case 'updateInfo':
       this.data = {
-        _id: this.data._id,
+        _id: ObjectID(this.data._id),
         username: this.data.username.trim().toLowerCase(),
         firstName: this.data.firstName.trim(),
         lastName: this.data.lastName.trim(),
         email: this.data.email.trim().toLowerCase(),
         about: {
-          bio: this.data.about.bio,
-          city: this.data.about.city,
-          musicCategory: this.data.about.musicCategory,
+          bio: sanitizeHTML(this.data.about.bio, { allowedTags: [], allowedAttributes: {} }),
+          city: sanitizeHTML(this.data.about.city, { allowedTags: [], allowedAttributes: {} }),
+          musicCategory: sanitizeHTML(this.data.about.musicCategory, {
+            allowedTags: [],
+            allowedAttributes: {},
+          }),
         },
       };
       break;
@@ -71,7 +80,7 @@ User.prototype.cleanUp = function (type) {
       break;
     case 'changePassword':
       this.data = {
-        _id: this.data._id,
+        _id: ObjectID(this.data._id),
         password: this.data.password,
       };
       break;
