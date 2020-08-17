@@ -45,10 +45,9 @@ User.prototype.cleanUp = function (type) {
         lastName: this.data.lastName.trim(),
         email: this.data.email.trim().toLowerCase(),
         about: {
-          bio: this.data.about && this.data.about.bio ? this.data.about.bio : '',
-          city: this.data.about && this.data.about.city ? this.data.about.city : '',
-          musicCategory:
-            this.data.about && this.data.about.musicCategory ? this.data.about.musicCategory : '',
+          bio: this.data.about.bio,
+          city: this.data.about.city,
+          musicCategory: this.data.about.musicCategory,
         },
       };
       break;
@@ -64,10 +63,9 @@ User.prototype.cleanUp = function (type) {
           'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
         password: this.data.password,
         about: {
-          bio: this.data.about && this.data.about.bio ? this.data.about.bio : '',
-          city: this.data.about && this.data.about.city ? this.data.about.city : '',
-          musicCategory:
-            this.data.about && this.data.about.musicCategory ? this.data.about.musicCategory : '',
+          bio: '',
+          city: '',
+          musicCategory: '',
         },
       };
       break;
