@@ -32,30 +32,47 @@ User.prototype.cleanUp = function (type) {
   // GET RID OF BOGUS PROPERTIES with
   this.data = {
     ...(type == 'updateInfo' && { _id: this.data._id }),
-    username: this.data.username.trim().toLowerCase(),
-    firstName: this.data.firstName.trim(),
-    lastName: this.data.lastName.trim(),
-    email: this.data.email.trim().toLowerCase(),
+
+    ...(type == 'register' ||
+      type == 'login' ||
+      (type == 'updateInfo' && { username: this.data.username.trim().toLowerCase() })),
+
+    ...(type == 'register' || (type == 'updateInfo' && { firstName: this.data.firstName.trim() })),
+
+    ...(type == 'register' || (type == 'updateInfo' && { lastName: this.data.lastName.trim() })),
+
+    ...(type == 'register' ||
+      (type == 'updateInfo' && { email: this.data.email.trim().toLowerCase() })),
+
     ...(type == 'register' && {
       userCreationDate: this.data.userCreationDate,
     }),
+
     ...(type == 'register' && {
       verified: false,
     }),
-    about: {
-      bio: this.data.about && this.data.about.bio ? this.data.about.bio : '',
-      city: this.data.about && this.data.about.city ? this.data.about.city : '',
-      musicCategory:
-        this.data.about && this.data.about.musicCategory ? this.data.about.musicCategory : '',
-    },
+
+    ...(type == 'register' ||
+      (type == 'updateInfo' && {
+        about: {
+          bio: this.data.about && this.data.about.bio ? this.data.about.bio : '',
+          city: this.data.about && this.data.about.city ? this.data.about.city : '',
+          musicCategory:
+            this.data.about && this.data.about.musicCategory ? this.data.about.musicCategory : '',
+        },
+      })),
+
     ...(type == 'register' && {
       avatar:
         'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
     }),
+
     ...(type == 'register' ||
-      (type == 'changePassword' && {
+      type == 'changePassword' ||
+      (type == 'login' && {
         password: this.data.password,
       })),
+
     ...(type == 'changePassword' && { _id: this.data._id }),
   };
 };
