@@ -58,6 +58,7 @@ User.prototype.cleanUp = function (type) {
           allowedTags: [],
           allowedAttributes: {},
         }),
+
         email: this.data.email.trim().toLowerCase(),
         about: {
           bio: sanitizeHTML(this.data.about.bio, { allowedTags: [], allowedAttributes: {} }),
@@ -83,6 +84,7 @@ User.prototype.cleanUp = function (type) {
           allowedTags: [],
           allowedAttributes: {},
         }),
+
         email: this.data.email.trim().toLowerCase(),
         userCreationDate: this.data.userCreationDate,
         verified: false,
