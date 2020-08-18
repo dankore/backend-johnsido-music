@@ -153,6 +153,17 @@ User.prototype.validate = function (type) {
     if (this.data.username && this.data.username.length > 30) {
       this.errors.push('Username cannot exceed 30 characters.');
     }
+    if (this.data.about) {
+      if (this.data.about.musicCategory.length > 50) {
+        this.errors.push('Music genre cannot exceed 50 characters.');
+      }
+      if (this.data.about.city.length > 70) {
+        this.errors.push('City/town name cannot exceed 70 characters.');
+      }
+      if (this.data.about.bio.length > 400) {
+        this.errors.push('Bio cannot exceed 400 characters.');
+      }
+    }
 
     // Only if username is valid then check to see if it's already taken
     if (
