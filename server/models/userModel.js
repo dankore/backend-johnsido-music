@@ -46,9 +46,18 @@ User.prototype.cleanUp = function (type) {
     case 'updateInfo':
       this.data = {
         _id: ObjectID(this.data._id),
-        username: this.data.username.trim().toLowerCase(),
-        firstName: this.data.firstName.trim(),
-        lastName: this.data.lastName.trim(),
+        username: sanitizeHTML(this.data.username.trim().toLowerCase(), {
+          allowedTags: [],
+          allowedAttributes: {},
+        }),
+        firstName: sanitizeHTML(this.data.firstName.trim(), {
+          allowedTags: [],
+          allowedAttributes: {},
+        }),
+        lastName: sanitizeHTML(this.data.lastName.trim(), {
+          allowedTags: [],
+          allowedAttributes: {},
+        }),
         email: this.data.email.trim().toLowerCase(),
         about: {
           bio: sanitizeHTML(this.data.about.bio, { allowedTags: [], allowedAttributes: {} }),
@@ -62,9 +71,18 @@ User.prototype.cleanUp = function (type) {
       break;
     case 'register':
       this.data = {
-        username: this.data.username.trim().toLowerCase(),
-        firstName: this.data.firstName.trim(),
-        lastName: this.data.lastName.trim(),
+        username: sanitizeHTML(this.data.username.trim().toLowerCase(), {
+          allowedTags: [],
+          allowedAttributes: {},
+        }),
+        firstName: sanitizeHTML(this.data.firstName.trim(), {
+          allowedTags: [],
+          allowedAttributes: {},
+        }),
+        lastName: sanitizeHTML(this.data.lastName.trim(), {
+          allowedTags: [],
+          allowedAttributes: {},
+        }),
         email: this.data.email.trim().toLowerCase(),
         userCreationDate: this.data.userCreationDate,
         verified: false,
@@ -81,7 +99,7 @@ User.prototype.cleanUp = function (type) {
     case 'changePassword':
       this.data = {
         _id: ObjectID(this.data._id),
-        password: this.data.password,
+        password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
       };
       break;
   }
