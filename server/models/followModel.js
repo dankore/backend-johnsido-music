@@ -5,10 +5,12 @@ const {
   ObjectID
 } = require('mongodb');
 
-let Follow = function (followedUsername, followerId) {
-  this.followedUsername = followedUsername;
-  this.followerId = followerId;
-  this.errors = [];
+let Follow = class follow {
+  constructor(followedUsername, followerId) {
+    this.followedUsername = followedUsername;
+    this.followerId = followerId;
+    this.errors = [];
+  }
 };
 
 Follow.prototype.validate = async function (type) {
@@ -28,10 +30,15 @@ Follow.prototype.validate = async function (type) {
     followerId: new ObjectID(this.followerId),
   });
 
-  if (type == 'followSomeone') {
+  if (type == 'followUser') {
     if (isFollowed) {
       this.errors.push('You are already following this user.');
     }
+  }
+
+  // USER SHOULD NOT FOLLOW THEMSELVES
+  if (this.followedId.equals(this.followerId)) {
+    this.errors.push('You cannot follow yourself.');
   }
 };
 
@@ -41,10 +48,10 @@ Follow.prototype.cleanUp = function () {
   }
 };
 
-Follow.prototype.followSomeone = function () {
+Follow.prototype.followUser = function () {
   return new Promise(async (resolve, reject) => {
     this.cleanUp();
-    await this.validate('followSomeone');
+    await this.validate('followUser');
 
     // SAVE
     if (!this.errors.length) {
@@ -58,3 +65,5 @@ Follow.prototype.followSomeone = function () {
     }
   });
 };
+
+module.exports = Follow;

@@ -18,7 +18,9 @@ exports.apiRegister = (req, res) => {
             userCreationDate: user.data.userCreationDate,
           },
           process.env.JWTSECRET,
-          { expiresIn: tokenLasts }
+          {
+            expiresIn: tokenLasts,
+          }
         ),
         _id: user.data._id,
         username: user.data.username,
@@ -56,7 +58,9 @@ exports.apiLogin = (req, res) => {
             userCreationDate: user.data.userCreationDate,
           },
           process.env.JWTSECRET,
-          { expiresIn: tokenLasts }
+          {
+            expiresIn: tokenLasts,
+          }
         ),
         _id: user.data._id,
         username: user.data.username,
@@ -149,7 +153,9 @@ exports.apiSaveUpdatedProfileInfo = (req, res) => {
             userCreationDate: user.data.userCreationDate,
           },
           process.env.JWTSECRET,
-          { expiresIn: tokenLasts }
+          {
+            expiresIn: tokenLasts,
+          }
         ),
       });
     })
