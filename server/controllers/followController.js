@@ -1,9 +1,13 @@
-let Follow = function (followedUsername, authorId) {
-  this.followedUsername = followedUsername;
-  this.authorId = authorId;
-  this.errors = [];
-};
+const Follow = require('../models/followModel');
 
-Follow.prototype.followUser = function () {
-  //
+exports.apiFollowUser = (req, res) => {
+  let follow = new Follow(req.params.username, req.apiUser._id);
+  follow
+    .followUser()
+    .then(() => {
+      res.json(true);
+    })
+    .catch(errors => {
+      res.json(errors);
+    });
 };
