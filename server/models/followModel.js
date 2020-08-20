@@ -1,9 +1,7 @@
 const usersCollection = require('../../db').db().collection('users');
 const followsCollection = require('../../db').db().collection('follows');
 // eslint-disable-next-line prettier/prettier
-const {
-  ObjectID
-} = require('mongodb');
+const { ObjectID } = require('mongodb');
 
 let Follow = class follow {
   constructor(followedUsername, followerId) {
@@ -37,7 +35,7 @@ Follow.prototype.validate = async function (type) {
   }
 
   // USER SHOULD NOT FOLLOW THEMSELVES
-  if (this.followedId.equals(this.followerId)) {
+  if (this.followedId === this.followerId) {
     this.errors.push('You cannot follow yourself.');
   }
 };
