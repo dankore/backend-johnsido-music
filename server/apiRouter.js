@@ -22,6 +22,7 @@ apiRouter.post('/change-password', userController.isLoggedIn, userController.api
 apiRouter.post(
   '/profile/:username',
   userController.apiIsUserRegistered,
+  userController.sharedProfiledata,
   userController.profileBasicData
 );
 

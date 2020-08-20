@@ -64,4 +64,13 @@ Follow.prototype.followUser = function () {
   });
 };
 
+Follow.isUserFollowingVisistedProfile = async (followedId, followerId) => {
+  const followDoc = await followsCollection.findOne({
+    followedId: followedId,
+    followerId: new ObjectID(followerId),
+  });
+
+  return followDoc ? true : false;
+};
+
 module.exports = Follow;
