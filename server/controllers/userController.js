@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const Follow = require('../models/followModel');
 const tokenLasts = '30d';
 
 exports.apiRegister = (req, res) => {
@@ -102,24 +103,55 @@ exports.apiDoesUsernameExists = async (req, res) => {
   }
 };
 exports.apiIsUserRegistered = (req, res, next) => {
+  // USER EXISTS?
   User.findByUsername(req.params.username)
     .then(userDoc => {
-      req.profileUser = userDoc;
+      req.visitedProfile = userDoc;
       next();
     })
     .catch(error => {
       res.json(error);
     });
 };
+exports.sharedProfiledata = async (req, res, next) => {
+  let viewerId, viewer;
+  try {
+    viewer = jwt.verify(req.body.token, process.env.JWTSECRET);
+    viewerId = viewer._id;
+  } catch {
+    viewerId = 0;
+  }
+
+  req.isFollowing = await Follow.isUserFollowingVisistedProfile(req.visitedProfile._id, viewerId);
+
+  const followerCountPromise = Follow.countFollowersById(req.visitedProfile._id);
+  const followingCountPromise = Follow.countFollowingById(req.visitedProfile._id);
+  const [followerCount, followingCount] = await Promise.all([
+    followerCountPromise,
+    followingCountPromise,
+  ]);
+
+  req.followerCount = followerCount;
+  req.followingCount = followingCount;
+
+  console.log({ followingCount });
+
+  next();
+};
 exports.profileBasicData = (req, res) => {
-  if (req.profileUser) {
+  if (req.visitedProfile) {
     res.json({
-      profileUsername: req.profileUser.username,
-      profileFirstName: req.profileUser.firstName,
-      profileLastName: req.profileUser.lastName,
-      profileEmail: req.profileUser.email,
-      profileAvatar: req.profileUser.avatar,
-      profileAbout: req.profileUser.about,
+      profileUsername: req.visitedProfile.username,
+      profileFirstName: req.visitedProfile.firstName,
+      profileLastName: req.visitedProfile.lastName,
+      profileEmail: req.visitedProfile.email,
+      profileAvatar: req.visitedProfile.avatar,
+      profileAbout: req.visitedProfile.about,
+      isFollowing: req.isFollowing,
+      counts: {
+        followerCount: req.followerCount,
+        followingCount: req.followingCount,
+      },
     });
   } else {
     res.json(false);

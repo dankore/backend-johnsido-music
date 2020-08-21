@@ -64,4 +64,31 @@ Follow.prototype.followUser = function () {
   });
 };
 
+Follow.isUserFollowingVisistedProfile = async (followedId, followerId) => {
+  const followDoc = await followsCollection.findOne({
+    followedId: followedId,
+    followerId: new ObjectID(followerId),
+  });
+
+  return followDoc ? true : false;
+};
+
+Follow.countFollowersById = id => {
+  return new Promise(async resolve => {
+    const followerCount = await followsCollection.countDocuments({
+      followedId: id,
+    });
+    resolve(followerCount);
+  });
+};
+
+Follow.countFollowingById = id => {
+  return new Promise(async resolve => {
+    const followingCount = await followsCollection.countDocuments({
+      followerId: id,
+    });
+    resolve(followingCount);
+  });
+};
+
 module.exports = Follow;
