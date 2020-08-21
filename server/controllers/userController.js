@@ -124,12 +124,17 @@ exports.sharedProfiledata = async (req, res, next) => {
 
   req.isFollowing = await Follow.isUserFollowingVisistedProfile(req.visitedProfile._id, viewerId);
 
-  const followerCountPromises = Follow.countFollowersById(req.visitedProfile._id);
-  const [followerCount] = await Promise.all([followerCountPromises]);
+  const followerCountPromise = Follow.countFollowersById(req.visitedProfile._id);
+  const followingCountPromise = Follow.countFollowingById(req.visitedProfile._id);
+  const [followerCount, followingCount] = await Promise.all([
+    followerCountPromise,
+    followingCountPromise,
+  ]);
 
   req.followerCount = followerCount;
+  req.followingCount = followingCount;
 
-  console.log({ followerCount });
+  console.log({ followingCount });
 
   next();
 };
@@ -145,6 +150,7 @@ exports.profileBasicData = (req, res) => {
       isFollowing: req.isFollowing,
       counts: {
         followerCount: req.followerCount,
+        followingCount: req.followingCount,
       },
     });
   } else {
