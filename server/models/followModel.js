@@ -73,4 +73,13 @@ Follow.isUserFollowingVisistedProfile = async (followedId, followerId) => {
   return followDoc ? true : false;
 };
 
+Follow.countFollowersById = id => {
+  return new Promise(async resolve => {
+    const followerCount = await followsCollection.countDocuments({
+      followedId: id,
+    });
+    resolve(followerCount);
+  });
+};
+
 module.exports = Follow;
