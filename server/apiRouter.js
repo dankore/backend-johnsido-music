@@ -28,5 +28,10 @@ apiRouter.post(
 
 // FOLLOW
 apiRouter.post('/addFollow/:username', userController.isLoggedIn, followController.apiFollowUser);
+apiRouter.post(
+  '/stopFollowing/:username',
+  userController.isLoggedIn,
+  followController.apiStopFollowingUser
+);
 
 module.exports = apiRouter;
