@@ -134,8 +134,6 @@ exports.sharedProfiledata = async (req, res, next) => {
   req.followerCount = followerCount;
   req.followingCount = followingCount;
 
-  console.log({ followingCount });
-
   next();
 };
 exports.profileBasicData = (req, res) => {
