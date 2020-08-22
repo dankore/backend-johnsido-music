@@ -21,12 +21,17 @@ apiRouter.post('/change-password', userController.isLoggedIn, userController.api
 // PROFILE
 apiRouter.post(
   '/profile/:username',
-  userController.apiIsUserRegistered,
+  userController.isUserRegistered,
   userController.sharedProfiledata,
   userController.profileBasicData
 );
 
 // FOLLOW
 apiRouter.post('/addFollow/:username', userController.isLoggedIn, followController.apiFollowUser);
+apiRouter.post(
+  '/stopFollowing/:username',
+  userController.isLoggedIn,
+  followController.apiStopFollowingUser
+);
 
 module.exports = apiRouter;
