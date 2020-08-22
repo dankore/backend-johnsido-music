@@ -102,11 +102,12 @@ exports.apiDoesUsernameExists = async (req, res) => {
     console.log(error);
   }
 };
-exports.apiIsUserRegistered = (req, res, next) => {
+exports.isUserRegistered = (req, res, next) => {
   // USER EXISTS?
   User.findByUsername(req.params.username)
     .then(userDoc => {
       req.visitedProfile = userDoc;
+
       next();
     })
     .catch(error => {

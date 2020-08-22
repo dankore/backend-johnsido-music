@@ -268,9 +268,12 @@ User.findByEmail = email => {
           email: response.email,
           about: response.about,
         };
-      }
 
-      resolve(response);
+        resolve(response);
+      } else {
+        // USER DOES NOT EXISTS
+        reject(false);
+      }
     } catch (error) {
       reject(error);
     }
@@ -293,9 +296,12 @@ User.findByUsername = username => {
           avatar: response.avatar,
           about: response.about,
         };
-      }
 
-      resolve(response);
+        resolve(response);
+      } else {
+        // USER DOES NOT EXISTS
+        reject(false);
+      }
     } catch (error) {
       reject(error);
     }
