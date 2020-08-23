@@ -140,6 +140,7 @@ exports.sharedProfiledata = async (req, res, next) => {
 exports.profileBasicData = (req, res) => {
   if (req.visitedProfile) {
     res.json({
+      profileId: req.visitedProfile._id,
       profileUsername: req.visitedProfile.username,
       profileFirstName: req.visitedProfile.firstName,
       profileLastName: req.visitedProfile.lastName,

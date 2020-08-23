@@ -1,7 +1,7 @@
 const Comments = require('../models/commentsModel');
 
 exports.apiFetchComments = (req, res) => {
-  Comments.fetchComments('5f34ce62026d250eb88342a3')
+  Comments.fetchComments(req.body.userId)
     .then(response => {
       res.json(response);
     })

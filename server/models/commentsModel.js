@@ -8,7 +8,7 @@ const Comments = class comments {
   }
 };
 
-Comments.reuseableQuery = function (uniqueOperations) {
+Comments.reUseableQuery = function (uniqueOperations) {
   return new Promise(async resolve => {
     const aggOperations = uniqueOperations.concat([
       {
@@ -55,7 +55,7 @@ Comments.fetchComments = id => {
       });
 
       // LOOK UP THE USER AND COMMENT INFO OF COMMENT AUTHORS
-      const results = await Comments.reuseableQuery([{ $match: { author: { $in: comments } } }]);
+      const results = await Comments.reUseableQuery([{ $match: { author: { $in: comments } } }]);
 
       resolve(results);
     } catch (error) {
