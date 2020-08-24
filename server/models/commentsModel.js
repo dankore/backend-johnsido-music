@@ -10,39 +10,43 @@ const Comments = class comments {
 };
 
 Comments.reUseableQuery = function (uniqueOperations) {
-  return new Promise(async resolve => {
-    const aggOperations = uniqueOperations.concat([
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'author',
-          foreignField: '_id',
-          as: 'authorDoc',
+  return new Promise(async (resolve, reject) => {
+    try {
+      const aggOperations = uniqueOperations.concat([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'author',
+            foreignField: '_id',
+            as: 'authorDoc',
+          },
         },
-      },
-      {
-        $project: {
-          comment: 1,
-          author: { $arrayElemAt: ['$authorDoc', 0] },
+        {
+          $project: {
+            comment: 1,
+            author: { $arrayElemAt: ['$authorDoc', 0] },
+          },
         },
-      },
-    ]);
+      ]);
 
-    let comments = await commentsCollection.aggregate(aggOperations).toArray();
+      let comments = await commentsCollection.aggregate(aggOperations).toArray();
 
-    // CLEAN UP AUTHOR
-    comments = comments.map(comment => {
-      comment.author = {
-        username: comment.author.username,
-        firstName: comment.author.firstName,
-        lastName: comment.author.lastName,
-        avatar: comment.author.avatar,
-      };
+      // CLEAN UP AUTHOR
+      comments = comments.map(comment => {
+        comment.author = {
+          username: comment.author.username,
+          firstName: comment.author.firstName,
+          lastName: comment.author.lastName,
+          avatar: comment.author.avatar,
+        };
 
-      return comment;
-    });
+        return comment;
+      });
 
-    resolve(comments);
+      resolve(comments);
+    } catch (error) {
+      reject(error);
+    }
   });
 };
 
@@ -82,7 +86,7 @@ Comments.prototype.cleanUp = function () {
 
   // CLEAN UP
   this.data = {
-    author: this.data.author,
+    author: ObjectID(this.data.author),
     comment: this.data.comment,
     profileOwner: this.data.profileOwner,
   };
@@ -111,7 +115,6 @@ Comments.prototype.add = function () {
       this.cleanUp();
       await this.validate();
 
-      console.log(this.data);
       if (!this.errors.length) {
         await commentsCollection.insertOne(this.data);
         resolve();
