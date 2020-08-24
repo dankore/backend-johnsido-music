@@ -9,7 +9,7 @@ const Comments = class comments {
   }
 };
 
-Comments.reUseableQuery = function (uniqueOperations) {
+Comments.reUseableQuery = function (uniqueOperations, profileOwnerId) {
   return new Promise(async (resolve, reject) => {
     try {
       const aggOperations = uniqueOperations.concat([
@@ -23,6 +23,7 @@ Comments.reUseableQuery = function (uniqueOperations) {
         },
         {
           $project: {
+            profileOwner: 1,
             comment: 1,
             author: { $arrayElemAt: ['$authorDoc', 0] },
           },
@@ -31,16 +32,17 @@ Comments.reUseableQuery = function (uniqueOperations) {
 
       let comments = await commentsCollection.aggregate(aggOperations).toArray();
 
-      // CLEAN UP AUTHOR
-      comments = comments.map(comment => {
-        comment.author = {
-          username: comment.author.username,
-          firstName: comment.author.firstName,
-          lastName: comment.author.lastName,
-          avatar: comment.author.avatar,
-        };
-
-        return comment;
+      // CLEAN UP
+      comments = comments.filter(comment => {
+        if (comment.profileOwner.equals(profileOwnerId)) {
+          comment.author = {
+            username: comment.author.username,
+            firstName: comment.author.firstName,
+            lastName: comment.author.lastName,
+            avatar: comment.author.avatar,
+          };
+          return comment;
+        }
       });
 
       resolve(comments);
@@ -60,7 +62,10 @@ Comments.fetchComments = id => {
       });
 
       // LOOK UP THE USER AND COMMENT INFO OF COMMENT AUTHORS
-      const results = await Comments.reUseableQuery([{ $match: { author: { $in: comments } } }]);
+      const results = await Comments.reUseableQuery(
+        [{ $match: { author: { $in: comments } } }],
+        id
+      );
 
       resolve(results);
     } catch (error) {
