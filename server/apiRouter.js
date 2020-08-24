@@ -36,6 +36,10 @@ apiRouter.post(
 );
 
 // COMMENTS
-apiRouter.post('/profile/:username/comments', commentsController.apiFetchComments);
+apiRouter.post(
+  '/profile/:username/comments',
+  userController.isUserRegistered,
+  commentsController.apiFetchComments
+);
 
 module.exports = apiRouter;
