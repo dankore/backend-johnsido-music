@@ -64,4 +64,14 @@ Comments.fetchComments = id => {
   });
 };
 
+Comments.countCommentsById = id => {
+  return new Promise(async resolve => {
+    const commentsCount = await commentsCollection.countDocuments({
+      profileOwner: id,
+    });
+
+    resolve(commentsCount);
+  });
+};
+
 module.exports = Comments;
