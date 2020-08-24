@@ -1,4 +1,5 @@
 const commentsCollection = require('../../db').db().collection('comments');
+const usersCollection = require('../../db').db().collection('users');
 const { ObjectID } = require('mongodb');
 
 const Comments = class comments {
@@ -71,6 +72,55 @@ Comments.countCommentsById = id => {
     });
 
     resolve(commentsCount);
+  });
+};
+
+Comments.prototype.cleanUp = function () {
+  if (typeof this.data.comment != 'string') {
+    this.data.comment = '';
+  }
+
+  // CLEAN UP
+  this.data = {
+    author: this.data.author,
+    comment: this.data.comment,
+    profileOwner: this.data.profileOwner,
+  };
+};
+
+Comments.prototype.validate = function () {
+  return new Promise(async (resolve, reject) => {
+    if (this.data.comment == '') {
+      this.errors.push('Comment field is empty.');
+    }
+
+    const userDoc = await usersCollection.findOne({ username: this.data.profileOwner });
+    if (userDoc) {
+      this.data.profileOwner = userDoc._id;
+    } else {
+      reject('This username does not exist.');
+    }
+
+    resolve();
+  });
+};
+
+Comments.prototype.add = function () {
+  return new Promise(async (resolve, reject) => {
+    try {
+      this.cleanUp();
+      await this.validate();
+
+      console.log(this.data);
+      if (!this.errors.length) {
+        await commentsCollection.insertOne(this.data);
+        resolve();
+      } else {
+        reject(this.errors);
+      }
+    } catch (error) {
+      reject(error);
+    }
   });
 };
 

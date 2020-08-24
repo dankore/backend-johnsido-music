@@ -9,3 +9,16 @@ exports.apiFetchComments = (req, res) => {
       res.json(errors);
     });
 };
+
+exports.apiAddComment = (req, res) => {
+  const comment = new Comments(req.body);
+
+  comment
+    .add()
+    .then(response => {
+      res.json(response);
+    })
+    .catch(errors => {
+      res.json(errors);
+    });
+};

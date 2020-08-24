@@ -41,5 +41,6 @@ apiRouter.post(
   userController.isUserRegistered,
   commentsController.apiFetchComments
 );
+apiRouter.post('/addComment', userController.isLoggedIn, commentsController.apiAddComment);
 
 module.exports = apiRouter;
