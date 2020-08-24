@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const Follow = require('../models/followModel');
+const Comments = require('../models/commentsModel');
 const tokenLasts = '30d';
 
 exports.apiRegister = (req, res) => {
@@ -127,19 +128,23 @@ exports.sharedProfiledata = async (req, res, next) => {
 
   const followerCountPromise = Follow.countFollowersById(req.visitedProfile._id);
   const followingCountPromise = Follow.countFollowingById(req.visitedProfile._id);
-  const [followerCount, followingCount] = await Promise.all([
+  const commentsCountPromise = Comments.countCommentsById(req.visitedProfile._id);
+  const [followerCount, followingCount, commentsCount] = await Promise.all([
     followerCountPromise,
     followingCountPromise,
+    commentsCountPromise,
   ]);
 
   req.followerCount = followerCount;
   req.followingCount = followingCount;
+  req.commentsCount = commentsCount;
 
   next();
 };
 exports.profileBasicData = (req, res) => {
   if (req.visitedProfile) {
     res.json({
+      profileId: req.visitedProfile._id,
       profileUsername: req.visitedProfile.username,
       profileFirstName: req.visitedProfile.firstName,
       profileLastName: req.visitedProfile.lastName,
@@ -150,6 +155,7 @@ exports.profileBasicData = (req, res) => {
       counts: {
         followerCount: req.followerCount,
         followingCount: req.followingCount,
+        commentsCount: req.commentsCount,
       },
     });
   } else {

@@ -2,6 +2,7 @@ const express = require('express');
 const apiRouter = express.Router();
 const userController = require('./controllers/userController');
 const followController = require('./controllers/followController');
+const commentsController = require('./controllers/commentsController');
 
 apiRouter.get('/', (req, res) => res.end('API - John Sido Music'));
 apiRouter.post('/register', userController.apiRegister);
@@ -33,5 +34,13 @@ apiRouter.post(
   userController.isLoggedIn,
   followController.apiStopFollowingUser
 );
+
+// COMMENTS
+apiRouter.post(
+  '/profile/:username/comments',
+  userController.isUserRegistered,
+  commentsController.apiFetchComments
+);
+apiRouter.post('/addComment', userController.isLoggedIn, commentsController.apiAddComment);
 
 module.exports = apiRouter;
