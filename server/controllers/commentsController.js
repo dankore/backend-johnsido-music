@@ -22,3 +22,17 @@ exports.apiAddComment = (req, res) => {
       res.json(errors);
     });
 };
+
+exports.apiDeleteComment = (req, res) => {
+  if (req.apiUser.username == req.body.apiUser) {
+    Comments.delete(req.body.commentId)
+      .then(response => {
+        res.json(response);
+      })
+      .catch(error => {
+        res.json(error);
+      });
+  } else {
+    res.json('You do not have permission to delete this comment.');
+  }
+};

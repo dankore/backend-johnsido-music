@@ -24,6 +24,7 @@ Comments.reUseableQuery = function (uniqueOperations, profileOwnerId) {
         {
           $project: {
             profileOwner: 1,
+            createdDate: 1,
             comment: 1,
             author: { $arrayElemAt: ['$authorDoc', 0] },
           },
@@ -63,7 +64,7 @@ Comments.fetchComments = id => {
 
       // LOOK UP THE USER AND COMMENT INFO OF COMMENT AUTHORS
       const results = await Comments.reUseableQuery(
-        [{ $match: { author: { $in: comments } } }],
+        [{ $match: { author: { $in: comments } } }, { $sort: { createdDate: -1 } }],
         id
       );
 
@@ -94,6 +95,7 @@ Comments.prototype.cleanUp = function () {
     author: ObjectID(this.data.author),
     comment: this.data.comment,
     profileOwner: this.data.profileOwner,
+    createdDate: this.data.createdDate,
   };
 };
 
@@ -121,13 +123,31 @@ Comments.prototype.add = function () {
       await this.validate();
 
       if (!this.errors.length) {
-        await commentsCollection.insertOne(this.data);
-        resolve();
+        const { insertedId } = await commentsCollection.insertOne(this.data);
+
+        // GET COMMENT AND AUTHOR DETAILS
+        const result = await Comments.reUseableQuery(
+          [{ $match: { _id: new ObjectID(insertedId) } }],
+          this.data.profileOwner
+        );
+
+        resolve(result[0]);
       } else {
         reject(this.errors);
       }
     } catch (error) {
       reject(error);
+    }
+  });
+};
+
+Comments.delete = id => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await commentsCollection.findOneAndDelete({ _id: new ObjectID(id) });
+      resolve('Success');
+    } catch (error) {
+      reject('Delete failed');
     }
   });
 };

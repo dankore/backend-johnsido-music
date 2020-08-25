@@ -42,5 +42,6 @@ apiRouter.post(
   commentsController.apiFetchComments
 );
 apiRouter.post('/addComment', userController.isLoggedIn, commentsController.apiAddComment);
+apiRouter.post('/delete-comment', userController.isLoggedIn, commentsController.apiDeleteComment);
 
 module.exports = apiRouter;
