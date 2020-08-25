@@ -9,7 +9,7 @@ const Comments = class comments {
   }
 };
 
-Comments.reUseableQuery = function (uniqueOperations, profileOwnerId) {
+Comments.reUseableQuery = function (uniqueOperations, profileOwnerId, type) {
   return new Promise(async (resolve, reject) => {
     try {
       const aggOperations = uniqueOperations.concat([
@@ -121,8 +121,15 @@ Comments.prototype.add = function () {
       await this.validate();
 
       if (!this.errors.length) {
-        await commentsCollection.insertOne(this.data);
-        resolve();
+        const result1 = await commentsCollection.insertOne(this.data);
+
+        // GET COMMENT AND AUTHOR DETAILS
+        const result = await Comments.reUseableQuery(
+          [{ $match: { _id: new ObjectID(result1.ops[0]._id) } }],
+          this.data.profileOwner
+        );
+
+        resolve(result);
       } else {
         reject(this.errors);
       }
