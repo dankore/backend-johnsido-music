@@ -64,7 +64,7 @@ Comments.fetchComments = id => {
 
       // LOOK UP THE USER AND COMMENT INFO OF COMMENT AUTHORS
       const results = await Comments.reUseableQuery(
-        [{ $match: { author: { $in: comments } } }],
+        [{ $match: { author: { $in: comments } } }, { $sort: { createdDate: -1 } }],
         id
       );
 
