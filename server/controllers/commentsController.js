@@ -22,3 +22,13 @@ exports.apiAddComment = (req, res) => {
       res.json(errors);
     });
 };
+
+exports.apiDeleteComment = (req, res) => {
+  Comments.delete(req.body.commentId)
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
+};

@@ -24,6 +24,7 @@ Comments.reUseableQuery = function (uniqueOperations, profileOwnerId) {
         {
           $project: {
             profileOwner: 1,
+            createdDate: 1,
             comment: 1,
             author: { $arrayElemAt: ['$authorDoc', 0] },
           },
@@ -94,6 +95,7 @@ Comments.prototype.cleanUp = function () {
     author: ObjectID(this.data.author),
     comment: this.data.comment,
     profileOwner: this.data.profileOwner,
+    createdDate: this.data.createdDate,
   };
 };
 
@@ -135,6 +137,17 @@ Comments.prototype.add = function () {
       }
     } catch (error) {
       reject(error);
+    }
+  });
+};
+
+Comments.delete = id => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await commentsCollection.findOneAndDelete({ _id: new ObjectID(id) });
+      resolve('Success');
+    } catch (error) {
+      reject('Delete failed');
     }
   });
 };
