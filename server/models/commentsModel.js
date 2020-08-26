@@ -85,7 +85,7 @@ Comments.countCommentsById = id => {
   });
 };
 
-Comments.prototype.cleanUp = function () {
+Comments.prototype.cleanUp = function (type) {
   if (typeof this.data.comment != 'string') {
     this.data.comment = '';
   }
@@ -95,7 +95,8 @@ Comments.prototype.cleanUp = function () {
     author: ObjectID(this.data.author),
     comment: this.data.comment,
     profileOwner: this.data.profileOwner,
-    createdDate: this.data.createdDate,
+    ...(type == 'add' && { createdDate: this.data.createdDate }),
+    ...(type == 'edit' && { editedDate: this.data.editedDate }),
   };
 };
 
@@ -119,7 +120,7 @@ Comments.prototype.validate = function () {
 Comments.prototype.add = function () {
   return new Promise(async (resolve, reject) => {
     try {
-      this.cleanUp();
+      this.cleanUp('add');
       await this.validate();
 
       if (!this.errors.length) {
@@ -149,6 +150,13 @@ Comments.delete = id => {
     } catch (error) {
       reject('Delete failed');
     }
+  });
+};
+
+Comments.prototype.edit = function () {
+  return new Promise(async resolve => {
+    this.cleanUp('edit');
+    console.log(this.data, resolve);
   });
 };
 

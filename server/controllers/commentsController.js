@@ -38,16 +38,14 @@ exports.apiDeleteComment = (req, res) => {
 };
 
 exports.apiEditComment = (req, res) => {
-  console.log(req.body);
-  if (req.apiUser.username == req.body.apiUser) {
-    Comments.edit(req.body.commentId)
-      .then(response => {
-        res.json(response);
-      })
-      .catch(error => {
-        res.json(error);
-      });
-  } else {
-    res.json('You do not have permission to delete this comment.');
-  }
+  let comment = new Comments(req.body);
+
+  comment
+    .edit()
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
 };
