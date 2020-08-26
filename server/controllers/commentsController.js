@@ -36,3 +36,16 @@ exports.apiDeleteComment = (req, res) => {
     res.json('You do not have permission to delete this comment.');
   }
 };
+
+exports.apiEditComment = (req, res) => {
+  let comment = new Comments(req.body);
+
+  comment
+    .edit()
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
+};

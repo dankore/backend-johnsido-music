@@ -25,6 +25,7 @@ Comments.reUseableQuery = function (uniqueOperations, profileOwnerId) {
           $project: {
             profileOwner: 1,
             createdDate: 1,
+            editedDate: 1,
             comment: 1,
             author: { $arrayElemAt: ['$authorDoc', 0] },
           },
@@ -89,28 +90,34 @@ Comments.prototype.cleanUp = function () {
   if (typeof this.data.comment != 'string') {
     this.data.comment = '';
   }
-
-  // CLEAN UP
-  this.data = {
-    author: ObjectID(this.data.author),
-    comment: this.data.comment,
-    profileOwner: this.data.profileOwner,
-    createdDate: this.data.createdDate,
-  };
 };
 
-Comments.prototype.validate = function () {
+Comments.prototype.validate = function (type) {
   return new Promise(async (resolve, reject) => {
     if (this.data.comment == '') {
       this.errors.push('Comment field is empty.');
+    }
+    // CHECK FOR OWNERSHIP
+    if (this.profileOwner && this.profileOwner != this.apiUser) {
+      this.errors.push('You do no have the permission to perform that action.');
     }
 
     const userDoc = await usersCollection.findOne({ username: this.data.profileOwner });
     if (userDoc) {
       this.data.profileOwner = userDoc._id;
     } else {
-      reject('This username does not exist.');
+      reject('No account with this username exists.');
     }
+
+    // CLEAN UP
+    this.data = {
+      ...(type == 'add' && { author: ObjectID(this.data.author) }),
+      comment: this.data.comment,
+      ...(type == 'add' && { profileOwner: this.data.profileOwner }),
+      ...(type == 'add' && { createdDate: this.data.createdDate }),
+      ...(type == 'edit' && { editedDate: this.data.editedDate }),
+      ...(type == 'edit' && { commentId: this.data.commentId }),
+    };
 
     resolve();
   });
@@ -120,7 +127,7 @@ Comments.prototype.add = function () {
   return new Promise(async (resolve, reject) => {
     try {
       this.cleanUp();
-      await this.validate();
+      await this.validate('add');
 
       if (!this.errors.length) {
         const { insertedId } = await commentsCollection.insertOne(this.data);
@@ -148,6 +155,37 @@ Comments.delete = id => {
       resolve('Success');
     } catch (error) {
       reject('Delete failed');
+    }
+  });
+};
+
+Comments.prototype.edit = function () {
+  return new Promise(async (resolve, reject) => {
+    try {
+      this.cleanUp();
+      await this.validate('edit');
+
+      console.log(this.data);
+
+      if (!this.errors.length) {
+        commentsCollection.findOneAndUpdate(
+          {
+            _id: new ObjectID(this.data.commentId),
+          },
+          {
+            $set: {
+              comment: this.data.comment,
+              editedDate: this.data.editedDate,
+            },
+          }
+        );
+
+        resolve('Success');
+      } else {
+        reject(this.errors);
+      }
+    } catch (error) {
+      reject(error);
     }
   });
 };
