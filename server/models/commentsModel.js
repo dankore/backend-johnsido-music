@@ -111,11 +111,11 @@ Comments.prototype.validate = function (type) {
     this.data = {
       ...(type == 'add' && { author: ObjectID(this.data.author) }),
       ...(type == 'add' && {
-        comment: [{ text: this.data.comment, createdDate: this.data.createdDate }],
+        comment: [{ text: this.data.comment, createdDate: this.data.createdDate, edited: false }],
       }),
       ...(type == 'add' && { profileOwner: this.data.profileOwner }),
       ...(type == 'edit' && {
-        comment: { text: this.data.comment, createdDate: this.data.createdDate },
+        comment: { text: this.data.comment, createdDate: this.data.createdDate, edited: true },
       }),
       ...(type == 'edit' && { commentId: this.data.commentId }),
     };
