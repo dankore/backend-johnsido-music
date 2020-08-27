@@ -181,7 +181,7 @@ Comments.prototype.edit = function () {
           }
         );
 
-        resolve(commentDoc.value.comment);
+        resolve({ status: 'Success', comments: commentDoc.value.comment });
       } else {
         reject(this.errors);
       }
