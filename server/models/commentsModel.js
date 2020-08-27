@@ -24,8 +24,6 @@ Comments.reUseableQuery = function (uniqueOperations, profileOwnerId) {
         {
           $project: {
             profileOwner: 1,
-            createdDate: 1,
-            editedDate: 1,
             comment: 1,
             author: { $arrayElemAt: ['$authorDoc', 0] },
           },
@@ -65,7 +63,7 @@ Comments.fetchComments = id => {
 
       // LOOK UP THE USER AND COMMENT INFO OF COMMENT AUTHORS
       const results = await Comments.reUseableQuery(
-        [{ $match: { author: { $in: comments } } }, { $sort: { createdDate: -1 } }],
+        [{ $match: { author: { $in: comments } } }, { $sort: { _id: -1 } }],
         id
       );
 
@@ -112,10 +110,13 @@ Comments.prototype.validate = function (type) {
     // CLEAN UP
     this.data = {
       ...(type == 'add' && { author: ObjectID(this.data.author) }),
-      comment: this.data.comment,
+      ...(type == 'add' && {
+        comment: [{ text: this.data.comment, createdDate: this.data.createdDate }],
+      }),
       ...(type == 'add' && { profileOwner: this.data.profileOwner }),
-      ...(type == 'add' && { createdDate: this.data.createdDate }),
-      ...(type == 'edit' && { editedDate: this.data.editedDate }),
+      ...(type == 'edit' && {
+        comment: { text: this.data.comment, createdDate: this.data.createdDate },
+      }),
       ...(type == 'edit' && { commentId: this.data.commentId }),
     };
 
@@ -165,22 +166,22 @@ Comments.prototype.edit = function () {
       this.cleanUp();
       await this.validate('edit');
 
-      console.log(this.data);
-
       if (!this.errors.length) {
-        commentsCollection.findOneAndUpdate(
+        const commentDoc = await commentsCollection.findOneAndUpdate(
           {
             _id: new ObjectID(this.data.commentId),
           },
           {
-            $set: {
+            $push: {
               comment: this.data.comment,
-              editedDate: this.data.editedDate,
             },
+          },
+          {
+            returnOriginal: false,
           }
         );
 
-        resolve('Success');
+        resolve(commentDoc.value.comment);
       } else {
         reject(this.errors);
       }
