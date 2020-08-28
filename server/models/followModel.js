@@ -115,4 +115,69 @@ Follow.countFollowingById = id => {
   });
 };
 
+Follow.reUseableQuery = function (uniqueOperations, profileOwnerId) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const aggOperations = uniqueOperations.concat([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'followerId',
+            foreignField: '_id',
+            as: 'authorDoc',
+          },
+        },
+        {
+          $project: {
+            followedId: 1,
+            author: { $arrayElemAt: ['$authorDoc', 0] },
+          },
+        },
+      ]);
+
+      let followers = await followsCollection.aggregate(aggOperations).toArray();
+
+      followers = followers.filter(follower => {
+        if (follower.followedId.equals(profileOwnerId)) {
+          follower.author = {
+            username: follower.author.username,
+            firstName: follower.author.firstName,
+            lastName: follower.author.lastName,
+            avatar: follower.author.avatar,
+          };
+
+          return follower;
+        }
+      });
+      resolve(followers);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+Follow.getFollowers = visitedProfileId => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let followers = await followsCollection
+        .find({ followedId: new ObjectID(visitedProfileId) })
+        .toArray();
+
+      // GET ONLY THE FOLLOWERS IDS OF PROFILE @visitedProfileId
+      followers = followers.map(follow => {
+        return follow.followerId;
+      });
+
+      const results = await Follow.reUseableQuery(
+        [{ $match: { followerId: { $in: followers } } }],
+        visitedProfileId
+      );
+
+      resolve({ status: 'Success', followers: results });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = Follow;

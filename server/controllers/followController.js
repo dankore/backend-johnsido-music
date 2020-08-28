@@ -24,12 +24,12 @@ exports.apiStopFollowingUser = (req, res) => {
     .catch(() => [res.json(false)]);
 };
 
-exports.apiFetchFollowers = (req, res) => [
-  Follow.getFollowers()
+exports.apiFetchFollowers = (req, res) => {
+  Follow.getFollowers(req.visitedProfile._id)
     .then(response => {
       res.json(response);
     })
     .catch(error => {
       res.json(error);
-    }),
-];
+    });
+};
