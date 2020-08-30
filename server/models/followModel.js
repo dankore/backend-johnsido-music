@@ -155,6 +155,8 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
             about: follower.author.about,
           };
 
+          console.log({ follower });
+
           return follower;
         }
       });
