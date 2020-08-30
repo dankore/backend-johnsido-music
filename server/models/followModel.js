@@ -88,7 +88,7 @@ Follow.prototype.stopFollowingUser = function () {
   });
 };
 
-Follow.isUserFollowingVisistedProfile = async (followedId, followerId) => {
+Follow.isUserFollowingVisitedProfile = async (followedId, followerId) => {
   const followDoc = await followsCollection.findOne({
     followedId: followedId,
     followerId: new ObjectID(followerId),
@@ -115,7 +115,7 @@ Follow.countFollowingById = id => {
   });
 };
 
-Follow.reUseableQuery = function (uniqueOperations, profileOwnerId) {
+Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUserId) {
   return new Promise(async (resolve, reject) => {
     try {
       const aggOperations = uniqueOperations.concat([
@@ -137,18 +137,28 @@ Follow.reUseableQuery = function (uniqueOperations, profileOwnerId) {
 
       let followers = await followsCollection.aggregate(aggOperations).toArray();
 
-      followers = followers.filter(follower => {
-        if (follower.followedId.equals(profileOwnerId)) {
+      followers = followers.filter(async follower => {
+        if (new ObjectID(follower.followedId).equals(new ObjectID(visitedProfileId))) {
+          // TODO: IS VISITED PROFILE OWNER FOLLOWING THIS AUTHOR?
+          follower.isFollowing = await Follow.isUserFollowingVisitedProfile(
+            follower.author._id,
+            loggedInUserId
+          );
+
+          console.log(follower.author.firstName, follower.isFollowing);
+
           follower.author = {
             username: follower.author.username,
             firstName: follower.author.firstName,
             lastName: follower.author.lastName,
             avatar: follower.author.avatar,
+            about: follower.author.about,
           };
 
           return follower;
         }
       });
+
       resolve(followers);
     } catch (error) {
       reject(error);
@@ -156,8 +166,9 @@ Follow.reUseableQuery = function (uniqueOperations, profileOwnerId) {
   });
 };
 
-Follow.getFollowers = visitedProfileId => {
+Follow.getFollowers = (visitedProfileId, loggedInUserId) => {
   return new Promise(async (resolve, reject) => {
+    console.log({ loggedInUserId });
     try {
       let followers = await followsCollection
         .find({ followedId: new ObjectID(visitedProfileId) })
@@ -170,7 +181,8 @@ Follow.getFollowers = visitedProfileId => {
 
       const results = await Follow.reUseableQuery(
         [{ $match: { followerId: { $in: followers } } }],
-        visitedProfileId
+        visitedProfileId,
+        loggedInUserId
       );
 
       resolve({ status: 'Success', followers: results });

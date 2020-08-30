@@ -124,7 +124,7 @@ exports.sharedProfiledata = async (req, res, next) => {
     viewerId = 0;
   }
 
-  req.isFollowing = await Follow.isUserFollowingVisistedProfile(req.visitedProfile._id, viewerId);
+  req.isFollowing = await Follow.isUserFollowingVisitedProfile(req.visitedProfile._id, viewerId);
 
   const followerCountPromise = Follow.countFollowersById(req.visitedProfile._id);
   const followingCountPromise = Follow.countFollowingById(req.visitedProfile._id);
