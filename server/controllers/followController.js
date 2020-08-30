@@ -27,6 +27,8 @@ exports.apiStopFollowingUser = (req, res) => {
 exports.apiFetchFollowers = (req, res) => {
   Follow.getFollowers(req.visitedProfile._id, req.body.loggedInUserId)
     .then(response => {
+      console.log({ response: response.followers });
+
       res.json(response);
     })
     .catch(error => {

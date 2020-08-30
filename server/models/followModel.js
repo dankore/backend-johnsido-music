@@ -137,31 +137,29 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
 
       let followers = await followsCollection.aggregate(aggOperations).toArray();
 
-      followers = followers.filter(async follower => {
+      const promises = followers.map(async follower => {
         if (new ObjectID(follower.followedId).equals(new ObjectID(visitedProfileId))) {
-          // TODO: IS VISITED PROFILE OWNER FOLLOWING THIS AUTHOR?
-          follower.isFollowing = await Follow.isUserFollowingVisitedProfile(
-            follower.author._id,
-            loggedInUserId
+          // IS VISITED PROFILE OWNER FOLLOWING THIS AUTHOR?
+          return Follow.isUserFollowingVisitedProfile(follower.author._id, loggedInUserId).then(
+            results => {
+              follower.isFollowing = results;
+              follower.author = {
+                username: follower.author.username,
+                firstName: follower.author.firstName,
+                lastName: follower.author.lastName,
+                avatar: follower.author.avatar,
+                about: follower.author.about,
+              };
+
+              return follower;
+            }
           );
-
-          console.log(follower.author.firstName, follower.isFollowing);
-
-          follower.author = {
-            username: follower.author.username,
-            firstName: follower.author.firstName,
-            lastName: follower.author.lastName,
-            avatar: follower.author.avatar,
-            about: follower.author.about,
-          };
-
-          console.log({ follower });
-
-          return follower;
         }
       });
 
-      resolve(followers);
+      Promise.all(promises).then(results => resolve(results));
+
+      // resolve(followers);
     } catch (error) {
       reject(error);
     }
