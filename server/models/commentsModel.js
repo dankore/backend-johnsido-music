@@ -97,7 +97,7 @@ Comments.prototype.validate = function (type) {
     }
     // CHECK FOR OWNERSHIP
     if (this.profileOwner && this.profileOwner != this.apiUser) {
-      this.errors.push('You do no have the permission to perform that action.');
+      this.errors.push('You do not have the permission to perform that action.');
     }
 
     const userDoc = await usersCollection.findOne({ username: this.data.profileOwner });
