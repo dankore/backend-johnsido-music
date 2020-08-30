@@ -157,7 +157,10 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
         }
       });
 
-      Promise.all(promises).then(results => resolve(results));
+      Promise.all(promises).then(results => {
+        results = results.filter(Boolean);
+        resolve(results);
+      });
 
       // resolve(followers);
     } catch (error) {
