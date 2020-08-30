@@ -142,7 +142,7 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
           // IS VISITED PROFILE OWNER FOLLOWING THIS AUTHOR?
           return Follow.isUserFollowingVisitedProfile(follower.author._id, loggedInUserId).then(
             results => {
-              follower.isFollowing = results;
+              follower.loggedInUserFollowsVisitedUser = results;
               follower.author = {
                 username: follower.author.username,
                 firstName: follower.author.firstName,
