@@ -36,7 +36,7 @@ Follow.prototype.validate = async function (type) {
 
   if (type == 'stopFollowing') {
     if (!isFollowed) {
-      this.errors('You are not following this user.');
+      this.errors.push('You are not following this user.');
     }
   }
 
@@ -189,7 +189,6 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
 
 Follow.getFollowers = (visitedProfileId, loggedInUserId) => {
   return new Promise(async (resolve, reject) => {
-    console.log({ loggedInUserId });
     try {
       let followers = await followsCollection
         .find({ followedId: new ObjectID(visitedProfileId) })
