@@ -90,7 +90,7 @@ Follow.prototype.stopFollowingUser = function () {
 
 Follow.isUserFollowingVisitedProfile = async (followedId, followerId) => {
   const followDoc = await followsCollection.findOne({
-    followedId: followedId,
+    followedId: new ObjectID(followedId),
     followerId: new ObjectID(followerId),
   });
 
@@ -139,30 +139,48 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
 
       const promises = followers.map(async follower => {
         if (new ObjectID(follower.followedId).equals(new ObjectID(visitedProfileId))) {
-          // IS VISITED PROFILE OWNER FOLLOWING THIS AUTHOR?
-          return Follow.isUserFollowingVisitedProfile(follower.author._id, loggedInUserId).then(
-            results => {
-              follower.loggedInUserFollowsVisitedUser = results;
-              follower.author = {
-                username: follower.author.username,
-                firstName: follower.author.firstName,
-                lastName: follower.author.lastName,
-                avatar: follower.author.avatar,
-                about: follower.author.about,
-              };
+          try {
+            const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
+              follower.author._id, // followedid
+              loggedInUserId // followerid
+            );
 
-              return follower;
-            }
-          );
+            const visitedUserFollowsLoggedInPromise = Follow.isUserFollowingVisitedProfile(
+              loggedInUserId,
+              follower.author._id
+            );
+
+            const [loggedInUserFollowsVisited, visitedUserFollowsLoggedIn] = await Promise.all([
+              loggedInUserFollowsVisitedPromise,
+              visitedUserFollowsLoggedInPromise,
+            ]);
+
+            follower.loggedInUserFollowsVisited = loggedInUserFollowsVisited;
+            follower.visitedUserFollowslogged = visitedUserFollowsLoggedIn;
+
+            follower.author = {
+              username: follower.author.username,
+              firstName: follower.author.firstName,
+              lastName: follower.author.lastName,
+              avatar: follower.author.avatar,
+              about: follower.author.about,
+            };
+
+            return follower;
+          } catch (error) {
+            reject(error);
+          }
         }
       });
 
-      Promise.all(promises).then(results => {
-        results = results.filter(Boolean);
-        resolve(results);
-      });
-
-      // resolve(followers);
+      Promise.all(promises)
+        .then(results => {
+          results = results.filter(Boolean);
+          resolve(results);
+        })
+        .catch(errors => {
+          reject(errors);
+        });
     } catch (error) {
       reject(error);
     }
