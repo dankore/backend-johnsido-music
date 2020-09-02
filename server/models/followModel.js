@@ -138,71 +138,25 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
 
       let follows = await followsCollection.aggregate(aggOperations).toArray();
 
-      console.log(visitedProfileId);
-
       const promises = follows.map(async follower => {
-        if (action) {
-          if (new ObjectID(follower.followerId).equals(new ObjectID(visitedProfileId))) {
+        // CLEAN FOLLOWERS
+        if (!action) {
+          if (new ObjectID(follower.followedId).equals(new ObjectID(visitedProfileId))) {
             try {
-              const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
-                follower.author._id, // followedid
-                loggedInUserId // followerid
-              );
-
-              const visitedUserFollowsLoggedInPromise = Follow.isUserFollowingVisitedProfile(
-                loggedInUserId,
-                follower.author._id
-              );
-
-              const [loggedInUserFollowsVisited, visitedUserFollowsLoggedIn] = await Promise.all([
-                loggedInUserFollowsVisitedPromise,
-                visitedUserFollowsLoggedInPromise,
-              ]);
-
-              follower.loggedInUserFollowsVisited = loggedInUserFollowsVisited;
-              follower.visitedUserFollowslogged = visitedUserFollowsLoggedIn;
-
-              follower.author = {
-                username: follower.author.username,
-                firstName: follower.author.firstName,
-                lastName: follower.author.lastName,
-                avatar: follower.author.avatar,
-                about: follower.author.about,
-              };
+              follower = await Follow.cleanFollow(follower, loggedInUserId);
 
               return follower;
             } catch (error) {
               reject(error);
             }
           }
-        } else {
-          if (new ObjectID(follower.followedId).equals(new ObjectID(visitedProfileId))) {
+        }
+
+        // CLEAN FOLLOWING
+        if (action) {
+          if (new ObjectID(follower.followerId).equals(new ObjectID(visitedProfileId))) {
             try {
-              const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
-                follower.author._id, // followedid
-                loggedInUserId // followerid
-              );
-
-              const visitedUserFollowsLoggedInPromise = Follow.isUserFollowingVisitedProfile(
-                loggedInUserId,
-                follower.author._id
-              );
-
-              const [loggedInUserFollowsVisited, visitedUserFollowsLoggedIn] = await Promise.all([
-                loggedInUserFollowsVisitedPromise,
-                visitedUserFollowsLoggedInPromise,
-              ]);
-
-              follower.loggedInUserFollowsVisited = loggedInUserFollowsVisited;
-              follower.visitedUserFollowslogged = visitedUserFollowsLoggedIn;
-
-              follower.author = {
-                username: follower.author.username,
-                firstName: follower.author.firstName,
-                lastName: follower.author.lastName,
-                avatar: follower.author.avatar,
-                about: follower.author.about,
-              };
+              follower = await Follow.cleanFollow(follower, loggedInUserId);
 
               return follower;
             } catch (error) {
@@ -212,6 +166,7 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
         }
       });
 
+      // GET ALL PROMISES
       Promise.all(promises)
         .then(results => {
           results = results.filter(Boolean);
@@ -276,6 +231,36 @@ Follow.getFollowing = (visitedProfileId, loggedInUserId) => {
       reject(error);
     }
   });
+};
+
+Follow.cleanFollow = async (follow, loggedInUserId) => {
+  const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
+    follow.author._id, // followedid
+    loggedInUserId // followerid
+  );
+
+  const visitedUserFollowsLoggedInPromise = Follow.isUserFollowingVisitedProfile(
+    loggedInUserId,
+    follow.author._id
+  );
+
+  const [loggedInUserFollowsVisited, visitedUserFollowsLoggedIn] = await Promise.all([
+    loggedInUserFollowsVisitedPromise,
+    visitedUserFollowsLoggedInPromise,
+  ]);
+
+  follow.loggedInUserFollowsVisited = loggedInUserFollowsVisited;
+  follow.visitedUserFollowslogged = visitedUserFollowsLoggedIn;
+
+  follow.author = {
+    username: follow.author.username,
+    firstName: follow.author.firstName,
+    lastName: follow.author.lastName,
+    avatar: follow.author.avatar,
+    about: follow.author.about,
+  };
+
+  return follow;
 };
 
 module.exports = Follow;
