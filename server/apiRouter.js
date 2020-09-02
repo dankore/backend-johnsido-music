@@ -39,6 +39,11 @@ apiRouter.post(
   userController.isUserRegistered,
   followController.apiFetchFollowers
 );
+apiRouter.post(
+  '/profile/:username/following',
+  userController.isUserRegistered,
+  followController.apiFetchFollowing
+);
 
 // COMMENTS
 apiRouter.post(

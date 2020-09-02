@@ -115,14 +115,14 @@ Follow.countFollowingById = id => {
   });
 };
 
-Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUserId) {
+Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUserId, action) {
   return new Promise(async (resolve, reject) => {
     try {
       const aggOperations = uniqueOperations.concat([
         {
           $lookup: {
             from: 'users',
-            localField: 'followerId',
+            localField: action ? 'followedId' : 'followerId',
             foreignField: '_id',
             as: 'authorDoc',
           },
@@ -130,45 +130,84 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
         {
           $project: {
             followedId: 1,
+            followerId: 1,
             author: { $arrayElemAt: ['$authorDoc', 0] },
           },
         },
       ]);
 
-      let followers = await followsCollection.aggregate(aggOperations).toArray();
+      let follows = await followsCollection.aggregate(aggOperations).toArray();
 
-      const promises = followers.map(async follower => {
-        if (new ObjectID(follower.followedId).equals(new ObjectID(visitedProfileId))) {
-          try {
-            const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
-              follower.author._id, // followedid
-              loggedInUserId // followerid
-            );
+      console.log(visitedProfileId);
 
-            const visitedUserFollowsLoggedInPromise = Follow.isUserFollowingVisitedProfile(
-              loggedInUserId,
-              follower.author._id
-            );
+      const promises = follows.map(async follower => {
+        if (action) {
+          if (new ObjectID(follower.followerId).equals(new ObjectID(visitedProfileId))) {
+            try {
+              const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
+                follower.author._id, // followedid
+                loggedInUserId // followerid
+              );
 
-            const [loggedInUserFollowsVisited, visitedUserFollowsLoggedIn] = await Promise.all([
-              loggedInUserFollowsVisitedPromise,
-              visitedUserFollowsLoggedInPromise,
-            ]);
+              const visitedUserFollowsLoggedInPromise = Follow.isUserFollowingVisitedProfile(
+                loggedInUserId,
+                follower.author._id
+              );
 
-            follower.loggedInUserFollowsVisited = loggedInUserFollowsVisited;
-            follower.visitedUserFollowslogged = visitedUserFollowsLoggedIn;
+              const [loggedInUserFollowsVisited, visitedUserFollowsLoggedIn] = await Promise.all([
+                loggedInUserFollowsVisitedPromise,
+                visitedUserFollowsLoggedInPromise,
+              ]);
 
-            follower.author = {
-              username: follower.author.username,
-              firstName: follower.author.firstName,
-              lastName: follower.author.lastName,
-              avatar: follower.author.avatar,
-              about: follower.author.about,
-            };
+              follower.loggedInUserFollowsVisited = loggedInUserFollowsVisited;
+              follower.visitedUserFollowslogged = visitedUserFollowsLoggedIn;
 
-            return follower;
-          } catch (error) {
-            reject(error);
+              follower.author = {
+                username: follower.author.username,
+                firstName: follower.author.firstName,
+                lastName: follower.author.lastName,
+                avatar: follower.author.avatar,
+                about: follower.author.about,
+              };
+
+              return follower;
+            } catch (error) {
+              reject(error);
+            }
+          }
+        } else {
+          if (new ObjectID(follower.followedId).equals(new ObjectID(visitedProfileId))) {
+            try {
+              const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
+                follower.author._id, // followedid
+                loggedInUserId // followerid
+              );
+
+              const visitedUserFollowsLoggedInPromise = Follow.isUserFollowingVisitedProfile(
+                loggedInUserId,
+                follower.author._id
+              );
+
+              const [loggedInUserFollowsVisited, visitedUserFollowsLoggedIn] = await Promise.all([
+                loggedInUserFollowsVisitedPromise,
+                visitedUserFollowsLoggedInPromise,
+              ]);
+
+              follower.loggedInUserFollowsVisited = loggedInUserFollowsVisited;
+              follower.visitedUserFollowslogged = visitedUserFollowsLoggedIn;
+
+              follower.author = {
+                username: follower.author.username,
+                firstName: follower.author.firstName,
+                lastName: follower.author.lastName,
+                avatar: follower.author.avatar,
+                about: follower.author.about,
+              };
+
+              return follower;
+            } catch (error) {
+              reject(error);
+            }
           }
         }
       });
@@ -206,6 +245,33 @@ Follow.getFollowers = (visitedProfileId, loggedInUserId) => {
       );
 
       resolve({ status: 'Success', followers: results });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+Follow.getFollowing = (visitedProfileId, loggedInUserId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      //WHO IS @VISITEDPROFILEID FOLLOWING?
+      let following = await followsCollection
+        .find({ followerId: new ObjectID(visitedProfileId) })
+        .toArray();
+
+      // GET ONLY THE FOLLOWING IDS OF PROFILE @visitedProfileId
+      following = following.map(follow => {
+        return follow.followedId;
+      });
+
+      const results = await Follow.reUseableQuery(
+        [{ $match: { followedId: { $in: following } } }],
+        visitedProfileId,
+        loggedInUserId,
+        'following'
+      );
+
+      resolve({ status: 'Success', following: results });
     } catch (error) {
       reject(error);
     }
