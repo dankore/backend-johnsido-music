@@ -33,3 +33,13 @@ exports.apiFetchFollowers = (req, res) => {
       res.json(error);
     });
 };
+
+exports.apiFetchFollowing = (req, res) => {
+  Follow.getFollowing(req.visitedProfile._id, req.body.loggedInUserId)
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
+};
