@@ -199,7 +199,7 @@ Follow.getFollowers = (visitedProfileId, loggedInUserId) => {
         loggedInUserId
       );
 
-      resolve({ status: 'Success', followers: results });
+      resolve({ status: 'Success', follows: results });
     } catch (error) {
       reject(error);
     }
@@ -226,7 +226,7 @@ Follow.getFollowing = (visitedProfileId, loggedInUserId) => {
         'following'
       );
 
-      resolve({ status: 'Success', following: results });
+      resolve({ status: 'Success', follows: results });
     } catch (error) {
       reject(error);
     }
