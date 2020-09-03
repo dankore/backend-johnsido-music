@@ -138,14 +138,13 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
 
       let follows = await followsCollection.aggregate(aggOperations).toArray();
 
-      const promises = follows.map(async follower => {
-        // CLEAN FOLLOWERS
+      const promises = follows.map(async follow => {
+        // CLEAN FOLLOWS
         if (!action) {
-          if (new ObjectID(follower.followedId).equals(new ObjectID(visitedProfileId))) {
+          if (new ObjectID(follow.followedId).equals(new ObjectID(visitedProfileId))) {
             try {
-              follower = await Follow.cleanFollow(follower, loggedInUserId);
-
-              return follower;
+              follow = await Follow.cleanFollow(follow, loggedInUserId);
+              return follow;
             } catch (error) {
               reject(error);
             }
@@ -154,11 +153,10 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
 
         // CLEAN FOLLOWING
         if (action) {
-          if (new ObjectID(follower.followerId).equals(new ObjectID(visitedProfileId))) {
+          if (new ObjectID(follow.followerId).equals(new ObjectID(visitedProfileId))) {
             try {
-              follower = await Follow.cleanFollow(follower, loggedInUserId);
-
-              return follower;
+              follow = await Follow.cleanFollow(follow, loggedInUserId);
+              return follow;
             } catch (error) {
               reject(error);
             }
