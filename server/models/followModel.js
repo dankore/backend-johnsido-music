@@ -24,7 +24,7 @@ Follow.prototype.validate = async function (type) {
 
   // DON'T FOLLOW A USER IF THEY ARE ALREADY BEING FOLLOWED
   const isFollowed = await followsCollection.findOne({
-    followedId: this.followedId,
+    followedId: new ObjectID(this.followedId),
     followerId: new ObjectID(this.followerId),
   });
 
@@ -41,7 +41,7 @@ Follow.prototype.validate = async function (type) {
   }
 
   // USER SHOULD NOT FOLLOW THEMSELVES
-  if (this.followedId === this.followerId) {
+  if (new ObjectID(this.followedId).equals(new ObjectID(this.followerId))) {
     this.errors.push('You cannot follow yourself.');
   }
 };
@@ -56,11 +56,12 @@ Follow.prototype.followUser = function () {
   return new Promise(async (resolve, reject) => {
     this.cleanUp();
     await this.validate('followUser');
+    console.log(this);
 
     // SAVE
     if (!this.errors.length) {
       await followsCollection.insertOne({
-        followedId: this.followedId,
+        followedId: new ObjectID(this.followedId),
         followerId: new ObjectID(this.followerId),
       });
       resolve();
@@ -78,7 +79,7 @@ Follow.prototype.stopFollowingUser = function () {
     // STOP FOLLWOING
     if (!this.errors.length) {
       await followsCollection.deleteOne({
-        followedId: this.followedId,
+        followedId: new ObjectID(this.followedId),
         followerId: new ObjectID(this.followerId),
       });
       resolve();
