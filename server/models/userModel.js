@@ -272,7 +272,7 @@ User.findByEmail = email => {
         resolve(response);
       } else {
         // USER DOES NOT EXISTS
-        reject(false);
+        resolve(false);
       }
     } catch (error) {
       reject(error);
@@ -300,7 +300,7 @@ User.findByUsername = username => {
         resolve(response);
       } else {
         // USER DOES NOT EXISTS
-        reject(false);
+        resolve(false);
       }
     } catch (error) {
       reject(error);
