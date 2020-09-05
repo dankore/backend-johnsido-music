@@ -169,7 +169,7 @@ exports.isLoggedIn = (req, res, next) => {
 
     next();
   } catch (error) {
-    res.json(['In order to perform this operation, you need to log in.']);
+    res.json(['You need to log in to perform this operation.']);
   }
 };
 

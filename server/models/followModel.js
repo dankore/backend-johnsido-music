@@ -56,7 +56,6 @@ Follow.prototype.followUser = function () {
   return new Promise(async (resolve, reject) => {
     this.cleanUp();
     await this.validate('followUser');
-    console.log(this);
 
     // SAVE
     if (!this.errors.length) {

@@ -2,6 +2,7 @@ const Follow = require('../models/followModel');
 
 exports.apiFollowUser = (req, res) => {
   let follow = new Follow(req.params.username, req.apiUser._id);
+  console.log({ followUser: follow });
 
   follow
     .followUser()
@@ -15,6 +16,7 @@ exports.apiFollowUser = (req, res) => {
 
 exports.apiStopFollowingUser = (req, res) => {
   let follow = new Follow(req.params.username, req.apiUser._id);
+  console.log({ stopFollowUser: follow });
 
   follow
     .stopFollowingUser()
