@@ -1,5 +1,7 @@
 /* eslint-disable no-async-promise-executor */
 const usersCollection = require('../../db').db().collection('users');
+const commentsCollection = require('../../db').db().collection('comments');
+const followsCollection = require('../../db').db().collection('follows');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { ObjectID } = require('mongodb');
@@ -379,6 +381,14 @@ User.deleteAccount = id => {
       await usersCollection.findOneAndDelete({ _id: new ObjectID(id) });
 
       resolve();
+
+      // DELETE COMMENTS
+      commentsCollection.deleteMany({ author: new ObjectID(id) });
+
+      // DELETE FOLLOWS
+      followsCollection.deleteMany({
+        $or: [{ followerId: new ObjectID(id) }, { followedId: new ObjectID(id) }],
+      });
     } catch (error) {
       reject(error);
     }
