@@ -6,7 +6,6 @@ const tokenLasts = '30d';
 
 exports.apiRegister = (req, res) => {
   let user = new User(req.body);
-  console.log({ user });
 
   user
     .register()
@@ -216,5 +215,15 @@ exports.apiChangePassword = (req, res) => {
     })
     .catch(errors => {
       res.json(errors);
+    });
+};
+
+exports.apiDeleteAccount = (req, res) => {
+  User.deleteAccount(req.apiUser._id)
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
     });
 };

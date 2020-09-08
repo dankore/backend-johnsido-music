@@ -373,5 +373,17 @@ User.prototype.changePassword = function () {
   });
 };
 
+User.deleteAccount = id => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await usersCollection.findOneAndDelete({ _id: new ObjectID(id) });
+
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 // EXPORT CODE
 module.exports = User;

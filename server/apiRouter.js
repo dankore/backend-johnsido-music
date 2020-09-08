@@ -19,6 +19,8 @@ apiRouter.post(
   userController.apiSaveUpdatedProfileInfo
 );
 apiRouter.post('/change-password', userController.isLoggedIn, userController.apiChangePassword);
+apiRouter.post('/delete-account', userController.isLoggedIn, userController.apiDeleteAccount);
+
 // PROFILE
 apiRouter.post(
   '/profile/:username',
