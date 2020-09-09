@@ -90,6 +90,7 @@ User.prototype.cleanUp = function (type) {
         email: this.data.email.trim().toLowerCase(),
         userCreationDate: this.data.userCreationDate,
         verified: false,
+        admin: false,
         avatar:
           'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
         password: this.data.password,
@@ -269,6 +270,8 @@ User.findByEmail = email => {
           avatar: response.avatar,
           email: response.email,
           about: response.about,
+          verified: response.verified,
+          admin: response.admin,
         };
 
         resolve(response);
@@ -297,6 +300,8 @@ User.findByUsername = username => {
           email: response.email,
           avatar: response.avatar,
           about: response.about,
+          verified: response.verified,
+          admin: response.admin,
         };
 
         resolve(response);
