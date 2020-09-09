@@ -29,7 +29,7 @@ exports.apiRegister = (req, res) => {
         firstName: user.data.firstName,
         lastName: user.data.lastName,
         verified: false,
-        admin: false,
+        scope: ['user'],
         about: {
           bio: '',
           city: '',
@@ -72,7 +72,7 @@ exports.apiLogin = (req, res) => {
         userCreationDate: user.data.userCreationDate,
         avatar: user.data.avatar,
         verified: user.data.verified,
-        admin: user.data.admin,
+        scope: user.data.scope,
         about: {
           bio: user.data.about.bio,
           city: user.data.about.city,
@@ -156,6 +156,8 @@ exports.profileBasicData = (req, res) => {
       profileAvatar: req.visitedProfile.avatar,
       profileAbout: req.visitedProfile.about,
       isFollowing: req.isFollowing,
+      profileScope: req.visitedProfile.scope,
+      profileVerified: req.visitedProfile.verified,
       counts: {
         followerCount: req.followerCount,
         followingCount: req.followingCount,
