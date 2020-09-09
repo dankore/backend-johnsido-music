@@ -388,10 +388,10 @@ User.deleteAccount = id => {
       resolve();
 
       // DELETE COMMENTS
-      commentsCollection.deleteMany({ author: new ObjectID(id) });
+      await commentsCollection.deleteMany({ author: new ObjectID(id) });
 
       // DELETE FOLLOWS
-      followsCollection.deleteMany({
+      await followsCollection.deleteMany({
         $or: [{ followerId: new ObjectID(id) }, { followedId: new ObjectID(id) }],
       });
     } catch (error) {
