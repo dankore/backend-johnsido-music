@@ -400,5 +400,23 @@ User.deleteAccount = id => {
   });
 };
 
+User.isAdmin = username => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const userDoc = await usersCollection.findOne({ username });
+
+      if (userDoc.scope?.indexOf('admin') > -1) {
+        // IS AN ADMIN
+        resolve(true);
+      } else {
+        // IS NOT AN ADMIN
+        resolve(false);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 // EXPORT CODE
 module.exports = User;

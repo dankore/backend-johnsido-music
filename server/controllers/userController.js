@@ -100,7 +100,6 @@ exports.apiDoesUsernameExists = async (req, res) => {
   try {
     const response = await User.findByUsername(req.body.username);
 
-    // ONLY SEND A PROPERTY OF THE RESPONSE OBJECT. NO NEED TO SEND ALL OBJECT OVER THE WIRE
     res.json(response);
   } catch (error) {
     // FAIL SILENTLY
@@ -230,4 +229,19 @@ exports.apiDeleteAccount = (req, res) => {
     .catch(error => {
       res.json(error);
     });
+};
+
+exports.isAdmin = async (req, res, next) => {
+  try {
+    const response = await User.isAdmin(req.params.username);
+
+    // @RESPONSE RETURNS TRUE/FALSE
+    if (response) {
+      next();
+    } else {
+      res.json(['You must be an admin to view this page.']);
+    }
+  } catch (error) {
+    res.json(error);
+  }
 };
