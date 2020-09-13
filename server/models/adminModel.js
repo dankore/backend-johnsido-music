@@ -1,3 +1,5 @@
+const { ObjectID } = require('mongodb');
+
 const usersCollection = require('../../db').db().collection('users');
 
 const Admin = class admin {
@@ -28,6 +30,25 @@ Admin.allUserDocs = () => {
     });
 
     resolve(allUserDocs);
+  });
+};
+
+Admin.downgradeAdminToUser = userId => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await usersCollection.findOneAndUpdate(
+        { _id: new ObjectID(userId) },
+        {
+          $pull: {
+            scope: 'admin',
+          },
+        }
+      );
+
+      resolve('Success');
+    } catch (error) {
+      reject(error);
+    }
   });
 };
 
