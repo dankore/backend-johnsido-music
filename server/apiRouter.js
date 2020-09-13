@@ -66,5 +66,11 @@ apiRouter.post(
   adminController.adminStats,
   adminController.apiGetAdminStats
 );
+apiRouter.post(
+  '/admin/:username/downgradeAdminToUser',
+  userController.isLoggedIn,
+  userController.isAdmin,
+  adminController.apiDowngradeAdminToUser
+);
 
 module.exports = apiRouter;

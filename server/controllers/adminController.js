@@ -15,3 +15,13 @@ exports.apiGetAdminStats = (req, res) => {
     },
   });
 };
+
+exports.apiDowngradeAdminToUser = (req, res) => {
+  Admin.downgradeAdminToUser(req.body.userId)
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
+};
