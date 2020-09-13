@@ -7,11 +7,27 @@ const Admin = class admin {
   }
 };
 
-Admin.countUsers = () => {
+Admin.allUserDocs = () => {
   return new Promise(async resolve => {
-    const totalUsers = await usersCollection.countDocuments();
+    const allUserDocs = await usersCollection.find().toArray();
 
-    resolve(totalUsers);
+    //CLEAN USER DOCS
+    allUserDocs.map(userDoc => {
+      userDoc = {
+        _id: userDoc._id,
+        username: userDoc.username,
+        firstName: userDoc.firstName,
+        lastName: userDoc.lastName,
+        verified: userDoc.verified,
+        scope: userDoc.scope,
+        avatar: userDoc.avatar,
+        active: userDoc.active,
+      };
+
+      return userDoc;
+    });
+
+    resolve(allUserDocs);
   });
 };
 

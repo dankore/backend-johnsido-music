@@ -405,8 +405,8 @@ User.isAdmin = username => {
     try {
       const userDoc = await usersCollection.findOne({ username });
 
-      if (userDoc.scope?.indexOf('admin') > -1) {
-        // IS AN ADMIN
+      if (userDoc.scope.indexOf('admin') > -1) {
+        // IS AN ADMINddd
         resolve(true);
       } else {
         // IS NOT AN ADMIN

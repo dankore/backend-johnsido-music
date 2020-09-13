@@ -1,9 +1,9 @@
 const Admin = require('../models/adminModel');
 exports.adminStats = async (req, res, next) => {
-  const totalUsersPromise = Admin.countUsers();
-  const [totalUsers] = await Promise.all([totalUsersPromise]);
+  const allUserDocsPromise = Admin.allUserDocs();
+  const [allUserDocs] = await Promise.all([allUserDocsPromise]);
 
-  req.totalUsers = totalUsers;
+  req.allUserDocs = allUserDocs;
 
   next();
 };
@@ -11,7 +11,7 @@ exports.adminStats = async (req, res, next) => {
 exports.apiGetAdminStats = (req, res) => {
   res.json({
     adminStats: {
-      totalUsers: req.totalUsers,
+      allUserDocs: req.allUserDocs,
     },
   });
 };
