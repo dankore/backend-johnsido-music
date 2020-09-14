@@ -3,6 +3,7 @@ const apiRouter = express.Router();
 const userController = require('./controllers/userController');
 const followController = require('./controllers/followController');
 const commentsController = require('./controllers/commentsController');
+const adminController = require('./controllers/adminController');
 
 apiRouter.get('/', (req, res) => res.end('API - John Sido Music'));
 apiRouter.post('/register', userController.apiRegister);
@@ -56,5 +57,26 @@ apiRouter.post(
 apiRouter.post('/add-comment', userController.isLoggedIn, commentsController.apiAddComment);
 apiRouter.post('/delete-comment', userController.isLoggedIn, commentsController.apiDeleteComment);
 apiRouter.post('/edit-comment', userController.isLoggedIn, commentsController.apiEditComment);
+
+// ADMIN
+apiRouter.post(
+  '/admin-stats/:username',
+  userController.isLoggedIn,
+  userController.isAdmin,
+  adminController.adminStats,
+  adminController.apiGetAdminStats
+);
+apiRouter.post(
+  '/admin/:username/handleRoleAssignment',
+  userController.isLoggedIn,
+  userController.isAdmin,
+  adminController.apiHandleRoleAssignment
+);
+apiRouter.post(
+  '/admin/:username/handleBanUser',
+  userController.isLoggedIn,
+  userController.isAdmin,
+  adminController.apiHandleBanUser
+);
 
 module.exports = apiRouter;
