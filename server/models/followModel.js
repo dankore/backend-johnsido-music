@@ -144,6 +144,7 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
           if (new ObjectID(follow.followedId).equals(new ObjectID(visitedProfileId))) {
             try {
               follow = await Follow.cleanFollow(follow, loggedInUserId);
+              // console.log({ follow });
               return follow;
             } catch (error) {
               reject(error);

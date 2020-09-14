@@ -90,6 +90,7 @@ User.prototype.cleanUp = function (type) {
         email: this.data.email.trim().toLowerCase(),
         userCreationDate: this.data.userCreationDate,
         verified: false,
+        scope: ['user'],
         avatar:
           'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
         password: this.data.password,
@@ -269,6 +270,8 @@ User.findByEmail = email => {
           avatar: response.avatar,
           email: response.email,
           about: response.about,
+          verified: response.verified,
+          scope: response.scope,
         };
 
         resolve(response);
@@ -297,6 +300,8 @@ User.findByUsername = username => {
           email: response.email,
           avatar: response.avatar,
           about: response.about,
+          verified: response.verified,
+          scope: response.scope,
         };
 
         resolve(response);
@@ -383,12 +388,30 @@ User.deleteAccount = id => {
       resolve();
 
       // DELETE COMMENTS
-      commentsCollection.deleteMany({ author: new ObjectID(id) });
+      await commentsCollection.deleteMany({ author: new ObjectID(id) });
 
       // DELETE FOLLOWS
-      followsCollection.deleteMany({
+      await followsCollection.deleteMany({
         $or: [{ followerId: new ObjectID(id) }, { followedId: new ObjectID(id) }],
       });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+User.isAdmin = username => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const userDoc = await usersCollection.findOne({ username });
+
+      if (userDoc.scope.indexOf('admin') > -1) {
+        // IS AN ADMINddd
+        resolve(true);
+      } else {
+        // IS NOT AN ADMIN
+        resolve(false);
+      }
     } catch (error) {
       reject(error);
     }
