@@ -33,15 +33,41 @@ Admin.allUserDocs = () => {
   });
 };
 
-Admin.downgradeAdminToUser = userId => {
+Admin.handleRoleAssignment = (userId, type) => {
   return new Promise(async (resolve, reject) => {
     try {
       await usersCollection.findOneAndUpdate(
         { _id: new ObjectID(userId) },
         {
-          $pull: {
-            scope: 'admin',
-          },
+          ...(type == 'downgrade' && {
+            $pull: {
+              scope: 'admin',
+            },
+          }),
+
+          ...(type == 'upgrade' && {
+            $push: {
+              scope: 'admin',
+            },
+          }),
+        }
+      );
+
+      resolve('Success');
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+Admin.handleBanUser = (userId, type) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await usersCollection.findOneAndUpdate(
+        { _id: new ObjectID(userId) },
+        {
+          ...(type == 'inactivate' && { $set: { active: false } }),
+          ...(type == 'activate' && { $set: { active: true } }),
         }
       );
 

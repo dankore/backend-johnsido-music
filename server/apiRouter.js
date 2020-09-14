@@ -67,10 +67,16 @@ apiRouter.post(
   adminController.apiGetAdminStats
 );
 apiRouter.post(
-  '/admin/:username/downgradeAdminToUser',
+  '/admin/:username/handleRoleAssignment',
   userController.isLoggedIn,
   userController.isAdmin,
-  adminController.apiDowngradeAdminToUser
+  adminController.apiHandleRoleAssignment
+);
+apiRouter.post(
+  '/admin/:username/handleBanUser',
+  userController.isLoggedIn,
+  userController.isAdmin,
+  adminController.apiHandleBanUser
 );
 
 module.exports = apiRouter;

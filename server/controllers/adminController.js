@@ -16,8 +16,18 @@ exports.apiGetAdminStats = (req, res) => {
   });
 };
 
-exports.apiDowngradeAdminToUser = (req, res) => {
-  Admin.downgradeAdminToUser(req.body.userId)
+exports.apiHandleRoleAssignment = (req, res) => {
+  Admin.handleRoleAssignment(req.body.userId, req.body.type)
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
+};
+
+exports.apiHandleBanUser = (req, res) => {
+  Admin.handleBanUser(req.body.userId, req.body.type)
     .then(response => {
       res.json(response);
     })
