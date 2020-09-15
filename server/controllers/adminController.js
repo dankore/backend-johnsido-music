@@ -39,7 +39,11 @@ exports.apiHandleBanUser = (req, res) => {
 exports.apiAdminSearch = (req, res) => {
   Admin.adminSearch(req.params.searchText)
     .then(response => {
-      res.json(response);
+      res.json({
+    adminStats: {
+      allUserDocs: response,
+    },
+  });
     })
     .catch(error => {
       res.json(error);
