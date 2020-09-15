@@ -1,5 +1,4 @@
 const { ObjectID } = require('mongodb');
-
 const usersCollection = require('../../db').db().collection('users');
 
 const Admin = class admin {
@@ -77,5 +76,20 @@ Admin.handleBanUser = (userId, type) => {
     }
   });
 };
+
+Admin.adminSearch = (searchText) => {
+  return new Promise(async(resolve, reject) => {
+    if(typeof searchText == 'string'){
+
+      const searchResults = await usersCollection.find({$text: {$search: searchText }}).toArray();
+
+      console.log(searchResults);
+
+      resolve()
+    } else {
+      reject(['Must be a string.'])
+    }
+  })
+}
 
 module.exports = Admin;

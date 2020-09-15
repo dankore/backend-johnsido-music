@@ -78,5 +78,12 @@ apiRouter.post(
   userController.isAdmin,
   adminController.apiHandleBanUser
 );
+apiRouter.post(
+  '/admin/:username/:searchText',
+  userController.isLoggedIn,
+  userController.isAdmin,
+  adminController.apiAdminSearch
+);
+
 
 module.exports = apiRouter;

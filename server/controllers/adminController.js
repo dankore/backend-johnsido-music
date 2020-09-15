@@ -35,3 +35,16 @@ exports.apiHandleBanUser = (req, res) => {
       res.json(error);
     });
 };
+
+exports.apiAdminSearch = (req, res) => {
+  Admin.adminSearch(req.params.searchText)
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
+};
+
+
+
