@@ -40,15 +40,12 @@ exports.apiAdminSearch = (req, res) => {
   Admin.adminSearch(req.params.searchText)
     .then(response => {
       res.json({
-    adminStats: {
-      allUserDocs: response,
-    },
-  });
+        adminStats: {
+          allUserDocs: response,
+        },
+      });
     })
     .catch(error => {
       res.json(error);
     });
 };
-
-
-

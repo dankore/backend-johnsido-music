@@ -77,63 +77,63 @@ Admin.handleBanUser = (userId, type) => {
   });
 };
 
-Admin.adminSearch = (searchText) => {
-  return new Promise(async(resolve, reject) => {
-    if(typeof searchText == 'string' && searchText != ''){
+Admin.adminSearch = searchText => {
+  return new Promise(async (resolve, reject) => {
+    if (typeof searchText == 'string' && searchText != '') {
+      const searchResults = await usersCollection
+        .find(
+          {
+            $or: [
+              {
+                firstName: { $regex: new RegExp(searchText, 'i') },
+              },
+              {
+                lastName: { $regex: new RegExp(searchText, 'i') },
+              },
+              {
+                username: { $regex: new RegExp(searchText, 'i') },
+              },
+              {
+                email: { $regex: new RegExp(searchText, 'i') },
+              },
+              {
+                verified: { $regex: new RegExp(searchText, 'i') },
+              },
+              {
+                active: { $regex: new RegExp(searchText, 'i') },
+              },
+              {
+                scope: { $regex: new RegExp(searchText, 'i') },
+              },
+            ],
+          },
+          {
+            $sort: { score: { $meta: 'textScore' } },
+          }
+        )
+        .toArray();
 
-      const searchResults = await usersCollection.find(
-            {
-              $or: [
-                {
-                  firstName: { $regex: new RegExp(searchText, "i") }
-                },
-                {
-                  lastName: { $regex: new RegExp(searchText, "i") }
-                },
-                {
-                  username: { $regex: new RegExp(searchText, "i") }
-                },
-                {
-                  email: { $regex: new RegExp(searchText, "i") }
-                },
-                {
-                  verified: { $regex: new RegExp(searchText, "i") }
-                },
-                {
-                  active: { $regex: new RegExp(searchText, "i") }
-                },
-                {
-                  scope: { $regex: new RegExp(searchText, "i") }
-                }
-              ]
-            },
-            {
-              $sort: { score: { $meta: "textScore" } }
-            }
-          )
-          .toArray();
+      //CLEAN USER DOCS
+      searchResults.map(userDoc => {
+        userDoc = {
+          _id: userDoc._id,
+          username: userDoc.username,
+          firstName: userDoc.firstName,
+          lastName: userDoc.lastName,
+          verified: userDoc.verified,
+          scope: userDoc.scope,
+          avatar: userDoc.avatar,
+          active: userDoc.active,
+        };
 
-       //CLEAN USER DOCS
-    searchResults.map(userDoc => {
-      userDoc = {
-        _id: userDoc._id,
-        username: userDoc.username,
-        firstName: userDoc.firstName,
-        lastName: userDoc.lastName,
-        verified: userDoc.verified,
-        scope: userDoc.scope,
-        avatar: userDoc.avatar,
-        active: userDoc.active,
-      };
+        return userDoc;
+      });
 
-      return userDoc;
-    });
-   
-      resolve(searchResults)
+      resolve(searchResults);
     } else {
-      reject(['Must be a string.'])
+      reject(['Must be a string.']);
     }
-  })
-}
+  });
+};
 
 module.exports = Admin;

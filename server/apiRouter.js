@@ -85,5 +85,4 @@ apiRouter.post(
   adminController.apiAdminSearch
 );
 
-
 module.exports = apiRouter;
