@@ -157,6 +157,7 @@ exports.profileBasicData = (req, res) => {
       isFollowing: req.isFollowing,
       profileScope: req.visitedProfile.scope,
       profileVerified: req.visitedProfile.verified,
+      profileActive: req.visitedProfile.active,
       counts: {
         followerCount: req.followerCount,
         followingCount: req.followingCount,

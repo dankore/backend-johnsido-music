@@ -302,6 +302,7 @@ User.findByUsername = username => {
           about: response.about,
           verified: response.verified,
           scope: response.scope,
+          active: response.active,
         };
 
         resolve(response);
