@@ -240,7 +240,7 @@ exports.isAdmin = async (req, res, next) => {
     if (response) {
       next();
     } else {
-      res.json(['You must be an admin to view this page.']);
+      res.json(['You must be an admin to view or edit this page.']);
     }
   } catch (error) {
     res.json(error);
