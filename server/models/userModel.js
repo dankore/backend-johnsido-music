@@ -288,6 +288,8 @@ User.findByEmail = email => {
 User.findByUsername = username => {
   return new Promise(async (resolve, reject) => {
     try {
+      username = username.toLowerCase();
+      
       let response = await usersCollection.findOne({ username });
 
       // CLEAN UP
