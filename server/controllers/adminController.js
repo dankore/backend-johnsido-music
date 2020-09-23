@@ -49,3 +49,19 @@ exports.apiAdminSearch = (req, res) => {
       res.json(error);
     });
 };
+
+exports.apiUploadSong = (req, res) => {
+  console.log(req);
+  console.log('lll');
+  // Admin.uploadSong(req.params.searchText)
+  //   .then(response => {
+  //     res.json({
+  //       adminStats: {
+  //         allUserDocs: response,
+  //       },
+  //     });
+    // })
+  //   .catch(error => {
+  //     res.json(error);
+  //   });
+};

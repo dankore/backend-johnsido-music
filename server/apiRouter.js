@@ -84,5 +84,11 @@ apiRouter.post(
   userController.isAdmin,
   adminController.apiAdminSearch
 );
+apiRouter.post(
+  '/admin/:username/uploadSong',
+  userController.isLoggedIn,
+  userController.isAdmin,
+  adminController.apiUploadSong
+);
 
 module.exports = apiRouter;
