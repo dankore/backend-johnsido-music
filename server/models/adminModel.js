@@ -136,4 +136,30 @@ Admin.adminSearch = searchText => {
   });
 };
 
+Admin.prototype.validateAudioUrl = function () {
+  let matchBaseUrl =
+    this.data.songUrl.split('https://res.cloudinary.com/my-nigerian-projects/video/upload')[0] ==
+    '';
+  let matchLengthStringBeforeFileName =
+    this.data.songUrl.split('audio')[1].split('.')[0].length == 21;
+
+  if (matchBaseUrl && matchLengthStringBeforeFileName) {
+    return true;
+  }
+
+  this.errors.push('Invalid song url');
+};
+
+Admin.prototype.uploadSong = function () {
+  return new Promise(async (resolve, reject) => {
+    this.validateAudioUrl();
+    if (!this.errors.length) {
+      // SAVE
+      console.log({ thisdata: this.data });
+    } else {
+      reject(this.errors);
+    }
+  });
+};
+
 module.exports = Admin;

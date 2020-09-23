@@ -38,7 +38,7 @@ exports.apiHandleBanUser = (req, res) => {
 };
 
 exports.apiAdminSearch = (req, res) => {
-  Admin.adminSearch(req.params.searchText)
+  Admin.adminSearch(req.body.searchText)
     .then(response => {
       res.json({
         adminStats: {
@@ -52,17 +52,14 @@ exports.apiAdminSearch = (req, res) => {
 };
 
 exports.apiUploadSong = (req, res) => {
-  console.log(req.body);
-  console.log('lll');
-  // Admin.uploadSong()
-  //   .then(response => {
-  //     res.json({
-  //       adminStats: {
-  //         allUserDocs: response,
-  //       },
-  //     });
-  //   })
-  //   .catch(error => {
-  //     res.json(error);
-  //   });
+  let admin = new Admin(req.body);
+
+  admin
+    .uploadSong()
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
 };
