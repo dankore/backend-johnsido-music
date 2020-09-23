@@ -78,5 +78,17 @@ apiRouter.post(
   userController.isAdmin,
   adminController.apiHandleBanUser
 );
+apiRouter.post(
+  '/admin/:username/:searchText',
+  userController.isLoggedIn,
+  userController.isAdmin,
+  adminController.apiAdminSearch
+);
+apiRouter.post(
+  '/admin/:username/uploadSong',
+  userController.isLoggedIn,
+  userController.isAdmin,
+  adminController.apiUploadSong
+);
 
 module.exports = apiRouter;

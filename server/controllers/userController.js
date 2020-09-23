@@ -157,6 +157,7 @@ exports.profileBasicData = (req, res) => {
       isFollowing: req.isFollowing,
       profileScope: req.visitedProfile.scope,
       profileVerified: req.visitedProfile.verified,
+      profileActive: req.visitedProfile.active,
       counts: {
         followerCount: req.followerCount,
         followingCount: req.followingCount,
@@ -171,6 +172,7 @@ exports.profileBasicData = (req, res) => {
 exports.isLoggedIn = (req, res, next) => {
   try {
     req.apiUser = jwt.verify(req.body.token, process.env.JWTSECRET);
+    console.log({ isloggedin: req.apiUser.username });
 
     next();
   } catch (error) {
@@ -234,12 +236,13 @@ exports.apiDeleteAccount = (req, res) => {
 exports.isAdmin = async (req, res, next) => {
   try {
     const response = await User.isAdmin(req.params.username);
+    console.log({ isadmin: response });
 
     // @RESPONSE RETURNS TRUE/FALSE
     if (response) {
       next();
     } else {
-      res.json(['You must be an admin to view this page.']);
+      res.json(['You must be an admin to view or edit this page.']);
     }
   } catch (error) {
     res.json(error);
