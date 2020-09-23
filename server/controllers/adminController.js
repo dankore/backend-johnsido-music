@@ -52,17 +52,17 @@ exports.apiAdminSearch = (req, res) => {
 };
 
 exports.apiUploadSong = (req, res) => {
-  console.log(req);
+  console.log(req.body);
   console.log('lll');
-  Admin.uploadSong(req.params.searchText)
-    .then(response => {
-      res.json({
-        adminStats: {
-          allUserDocs: response,
-        },
-      });
-    })
-    .catch(error => {
-      res.json(error);
-    });
+  // Admin.uploadSong()
+  //   .then(response => {
+  //     res.json({
+  //       adminStats: {
+  //         allUserDocs: response,
+  //       },
+  //     });
+  //   })
+  //   .catch(error => {
+  //     res.json(error);
+  //   });
 };
