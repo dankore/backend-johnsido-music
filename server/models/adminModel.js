@@ -153,6 +153,7 @@ Admin.prototype.validateAudioUrl = function () {
 };
 
 Admin.prototype.cleanUp = async function(){
+  //TODO - LENGTH OF SONG TILE LESS THAN 150 CHARACTERS
   // GET SONG OWNER'S ID. BETTER TO STORE THE ID THAN THE USERNAME FOR SEARCH LATER
   const userDoc = await User.findByUsername(this.data.songOwnerUsername);
 
@@ -172,8 +173,8 @@ Admin.prototype.uploadSong = function () {
     if (!this.errors.length) {
       // SAVE INTO DB
       const song = await songsCollection.insertOne(this.data);
-      console.log(song.insertedId);
-      resolve(song.insertedId);
+      
+      resolve(song.ops[0]);
     } else {
       reject(this.errors);
     }
