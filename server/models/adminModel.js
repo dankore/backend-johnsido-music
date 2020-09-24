@@ -140,12 +140,17 @@ Admin.adminSearch = searchText => {
 
 Admin.prototype.validate = function () {
   console.log('a');
+  console.log(this.data.songUrl);
   // SONG URL
   let matchBaseUrl =
-    this.data.songUrl.split('https://res.cloudinary.com/my-nigerian-projects/video/upload')[0] ==
+    this.data.songUrl && this.data.songUrl.split('https://res.cloudinary.com/my-nigerian-projects/video/upload')[0] ==
     '';
+    console.log({matchBaseUrl});
+ 
   let matchLengthStringBeforeFileName =
-    this.data.songUrl.split('audio')[1].split('.')[0].length == 21;
+    this.data.songUrl && this.data.songUrl.split('audio')[1] && this.data.songUrl.split('audio')[1].split('.')[0].length == 21;
+ 
+  
   if (!matchBaseUrl || !matchLengthStringBeforeFileName) {
     this.errors.push('Invalid song url');
   } 
