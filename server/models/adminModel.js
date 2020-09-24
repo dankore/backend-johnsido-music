@@ -138,22 +138,43 @@ Admin.adminSearch = searchText => {
   });
 };
 
-Admin.prototype.validateAudioUrl = function () {
+Admin.prototype.validate = function () {
+  console.log('a');
+  // SONG URL
   let matchBaseUrl =
     this.data.songUrl.split('https://res.cloudinary.com/my-nigerian-projects/video/upload')[0] ==
     '';
   let matchLengthStringBeforeFileName =
     this.data.songUrl.split('audio')[1].split('.')[0].length == 21;
-
-  if (matchBaseUrl && matchLengthStringBeforeFileName) {
-    return true;
+  if (!matchBaseUrl || !matchLengthStringBeforeFileName) {
+    this.errors.push('Invalid song url');
+  } 
+   
+  if(typeof this.data.songUrl != 'string'){
+    this.data.songUrl = '';
   }
-
-  this.errors.push('Invalid song url');
+  // SONG TITLE
+  if(this.data.songTitle.length < 3){
+    this.errors.push('Song title cannot be lower than 3 characters.');
+  }
+  if(this.data.songTitle.length > 150){
+    this.errors.push('Song title cannot exceed 150 characters.');
+  }
+  if(typeof this.data.songTitle != 'string'){
+    this.data.songTitle = '';
+  }
+  console.log('b');
 };
 
+
 Admin.prototype.cleanUp = async function(){
-  //TODO - LENGTH OF SONG TILE LESS THAN 150 CHARACTERS
+  console.log('c');
+  if(this.data.songUrl == ''){
+    this.errors.push('Song URL is empty.');
+  }
+  if(this.data.songTitle == ''){
+    this.errors.push('Song title is empty.');
+  }
   // GET SONG OWNER'S ID. BETTER TO STORE THE ID THAN THE USERNAME FOR SEARCH LATER
   const userDoc = await User.findByUsername(this.data.songOwnerUsername);
 
@@ -163,18 +184,20 @@ Admin.prototype.cleanUp = async function(){
     songPostedDate: this.data.datePosted,
     songUrl: this.data.songUrl
   }
+  console.log('d');
 }
 
 Admin.prototype.uploadSong = function () {
   return new Promise(async (resolve, reject) => {
    try{
-      this.validateAudioUrl();
+    this.validate();
     await this.cleanUp();
+   
     if (!this.errors.length) {
       // SAVE INTO DB
       const song = await songsCollection.insertOne(this.data);
       
-      resolve(song.ops[0]);
+      resolve({status: 'Success', songDetails: song.ops[0]});
     } else {
       reject(this.errors);
     }
