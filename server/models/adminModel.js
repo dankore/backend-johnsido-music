@@ -1,5 +1,7 @@
-const { ObjectID } = require('mongodb');
+const songsCollection = require('../../db').db().collection('songs');
 const usersCollection = require('../../db').db().collection('users');
+const { ObjectID } = require('mongodb');
+const User = require('./userModel');
 
 const Admin = class admin {
   constructor(data) {
@@ -136,29 +138,77 @@ Admin.adminSearch = searchText => {
   });
 };
 
-Admin.prototype.validateAudioUrl = function () {
+Admin.prototype.validate = function () {
+  console.log('a');
+  console.log(this.data.songUrl);
+  // SONG URL
   let matchBaseUrl =
-    this.data.songUrl.split('https://res.cloudinary.com/my-nigerian-projects/video/upload')[0] ==
+    this.data.songUrl && this.data.songUrl.split('https://res.cloudinary.com/my-nigerian-projects/video/upload')[0] ==
     '';
+    console.log({matchBaseUrl});
+ 
   let matchLengthStringBeforeFileName =
-    this.data.songUrl.split('audio')[1].split('.')[0].length == 21;
-
-  if (matchBaseUrl && matchLengthStringBeforeFileName) {
-    return true;
+    this.data.songUrl && this.data.songUrl.split('audio')[1] && this.data.songUrl.split('audio')[1].split('.')[0].length == 21;
+ 
+  
+  if (!matchBaseUrl || !matchLengthStringBeforeFileName) {
+    this.errors.push('Invalid song url');
+  } 
+   
+  if(typeof this.data.songUrl != 'string'){
+    this.data.songUrl = '';
   }
-
-  this.errors.push('Invalid song url');
+  // SONG TITLE
+  if(this.data.songTitle.length < 3){
+    this.errors.push('Song title cannot be lower than 3 characters.');
+  }
+  if(this.data.songTitle.length > 150){
+    this.errors.push('Song title cannot exceed 150 characters.');
+  }
+  if(typeof this.data.songTitle != 'string'){
+    this.data.songTitle = '';
+  }
+  console.log('b');
 };
+
+
+Admin.prototype.cleanUp = async function(){
+  console.log('c');
+  if(this.data.songUrl == ''){
+    this.errors.push('Song URL is empty.');
+  }
+  if(this.data.songTitle == ''){
+    this.errors.push('Song title is empty.');
+  }
+  // GET SONG OWNER'S ID. BETTER TO STORE THE ID THAN THE USERNAME FOR SEARCH LATER
+  const userDoc = await User.findByUsername(this.data.songOwnerUsername);
+
+  this.data = {
+    songOwnerId: userDoc._id,
+    songTitle: this.data.songTitle,
+    songPostedDate: this.data.datePosted,
+    songUrl: this.data.songUrl
+  }
+  console.log('d');
+}
 
 Admin.prototype.uploadSong = function () {
   return new Promise(async (resolve, reject) => {
-    this.validateAudioUrl();
+   try{
+    this.validate();
+    await this.cleanUp();
+   
     if (!this.errors.length) {
-      // SAVE
-      console.log({ thisdata: this.data });
+      // SAVE INTO DB
+      const song = await songsCollection.insertOne(this.data);
+      
+      resolve({status: 'Success', songDetails: song.ops[0]});
     } else {
       reject(this.errors);
     }
+   } catch(error){
+     reject(error);
+   }
   });
 };
 
