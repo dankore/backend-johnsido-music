@@ -1,5 +1,7 @@
-const { ObjectID } = require('mongodb');
+const songsCollection = require('../../db').db().collection('songs');
 const usersCollection = require('../../db').db().collection('users');
+const { ObjectID } = require('mongodb');
+const User = require('./userModel');
 
 const Admin = class admin {
   constructor(data) {
@@ -150,15 +152,34 @@ Admin.prototype.validateAudioUrl = function () {
   this.errors.push('Invalid song url');
 };
 
+Admin.prototype.cleanUp = async function(){
+  // GET SONG OWNER'S ID. BETTER TO STORE THE ID THAN THE USERNAME FOR SEARCH LATER
+  const userDoc = await User.findByUsername(this.data.songOwnerUsername);
+
+  this.data = {
+    songOwnerId: userDoc._id,
+    songTitle: this.data.songTitle,
+    songPostedDate: this.data.datePosted,
+    songUrl: this.data.songUrl
+  }
+}
+
 Admin.prototype.uploadSong = function () {
   return new Promise(async (resolve, reject) => {
-    this.validateAudioUrl();
+   try{
+      this.validateAudioUrl();
+    await this.cleanUp();
     if (!this.errors.length) {
-      // SAVE
-      console.log({ thisdata: this.data });
+      // SAVE INTO DB
+      const song = await songsCollection.insertOne(this.data);
+      console.log(song.insertedId);
+      resolve(song.insertedId);
     } else {
       reject(this.errors);
     }
+   } catch(error){
+     reject(error);
+   }
   });
 };
 
