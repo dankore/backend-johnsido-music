@@ -172,7 +172,6 @@ exports.profileBasicData = (req, res) => {
 exports.isLoggedIn = (req, res, next) => {
   try {
     req.apiUser = jwt.verify(req.body.token, process.env.JWTSECRET);
-    console.log({ isloggedin: req.apiUser.username });
 
     next();
   } catch (error) {
@@ -236,7 +235,6 @@ exports.apiDeleteAccount = (req, res) => {
 exports.isAdmin = async (req, res, next) => {
   try {
     const response = await User.isAdmin(req.params.username);
-    console.log({ isadmin: response });
 
     // @RESPONSE RETURNS TRUE/FALSE
     if (response) {
