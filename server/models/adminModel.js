@@ -182,7 +182,7 @@ Admin.prototype.cleanUp = async function () {
   this.data = {
     songOwnerId: userDoc._id,
     songTitle: this.data.songTitle,
-    songPostedDate: this.data.datePosted,
+    songPostedDate: this.data.songPostedDate,
     songUrl: this.data.songUrl,
   };
 };
