@@ -139,45 +139,41 @@ Admin.adminSearch = searchText => {
 };
 
 Admin.prototype.validate = function () {
-  console.log('a');
-  console.log(this.data.songUrl);
   // SONG URL
   let matchBaseUrl =
-    this.data.songUrl && this.data.songUrl.split('https://res.cloudinary.com/my-nigerian-projects/video/upload')[0] ==
-    '';
-    console.log({matchBaseUrl});
- 
+    this.data.songUrl &&
+    this.data.songUrl.split('https://res.cloudinary.com/my-nigerian-projects/video/upload')[0] ==
+      '';
+
   let matchLengthStringBeforeFileName =
-    this.data.songUrl && this.data.songUrl.split('audio')[1] && this.data.songUrl.split('audio')[1].split('.')[0].length == 21;
- 
-  
+    this.data.songUrl &&
+    this.data.songUrl.split('audio')[1] &&
+    this.data.songUrl.split('audio')[1].split('.')[0].length == 21;
+
   if (!matchBaseUrl || !matchLengthStringBeforeFileName) {
     this.errors.push('Invalid song url');
-  } 
-   
-  if(typeof this.data.songUrl != 'string'){
+  }
+
+  if (typeof this.data.songUrl != 'string') {
     this.data.songUrl = '';
   }
   // SONG TITLE
-  if(this.data.songTitle.length < 3){
+  if (this.data.songTitle.length < 3) {
     this.errors.push('Song title cannot be lower than 3 characters.');
   }
-  if(this.data.songTitle.length > 150){
+  if (this.data.songTitle.length > 150) {
     this.errors.push('Song title cannot exceed 150 characters.');
   }
-  if(typeof this.data.songTitle != 'string'){
+  if (typeof this.data.songTitle != 'string') {
     this.data.songTitle = '';
   }
-  console.log('b');
 };
 
-
-Admin.prototype.cleanUp = async function(){
-  console.log('c');
-  if(this.data.songUrl == ''){
+Admin.prototype.cleanUp = async function () {
+  if (this.data.songUrl == '') {
     this.errors.push('Song URL is empty.');
   }
-  if(this.data.songTitle == ''){
+  if (this.data.songTitle == '') {
     this.errors.push('Song title is empty.');
   }
   // GET SONG OWNER'S ID. BETTER TO STORE THE ID THAN THE USERNAME FOR SEARCH LATER
@@ -187,28 +183,27 @@ Admin.prototype.cleanUp = async function(){
     songOwnerId: userDoc._id,
     songTitle: this.data.songTitle,
     songPostedDate: this.data.datePosted,
-    songUrl: this.data.songUrl
-  }
-  console.log('d');
-}
+    songUrl: this.data.songUrl,
+  };
+};
 
 Admin.prototype.uploadSong = function () {
   return new Promise(async (resolve, reject) => {
-   try{
-    this.validate();
-    await this.cleanUp();
-   
-    if (!this.errors.length) {
-      // SAVE INTO DB
-      const song = await songsCollection.insertOne(this.data);
-      
-      resolve({status: 'Success', songDetails: song.ops[0]});
-    } else {
-      reject(this.errors);
+    try {
+      this.validate();
+      await this.cleanUp();
+
+      if (!this.errors.length) {
+        // SAVE INTO DB
+        const song = await songsCollection.insertOne(this.data);
+
+        resolve({ status: 'Success', songDetails: song.ops[0] });
+      } else {
+        reject(this.errors);
+      }
+    } catch (error) {
+      reject(error);
     }
-   } catch(error){
-     reject(error);
-   }
   });
 };
 
