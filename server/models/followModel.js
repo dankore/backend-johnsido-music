@@ -137,14 +137,13 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
       ]);
 
       let follows = await followsCollection.aggregate(aggOperations).toArray();
-
+     
       const promises = follows.map(async follow => {
         // CLEAN FOLLOWS
         if (!action) {
           if (new ObjectID(follow.followedId).equals(new ObjectID(visitedProfileId))) {
             try {
               follow = await Follow.cleanFollow(follow, loggedInUserId);
-              // console.log({ follow });
               return follow;
             } catch (error) {
               reject(error);
@@ -156,6 +155,7 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
         if (action) {
           if (new ObjectID(follow.followerId).equals(new ObjectID(visitedProfileId))) {
             try {
+              
               follow = await Follow.cleanFollow(follow, loggedInUserId);
               return follow;
             } catch (error) {
@@ -164,6 +164,8 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
           }
         }
       });
+
+      
 
       // GET ALL PROMISES
       Promise.all(promises)
@@ -192,13 +194,18 @@ Follow.getFollowers = (visitedProfileId, loggedInUserId) => {
         return follow.followerId;
       });
 
-      const results = await Follow.reUseableQuery(
+      Follow.reUseableQuery(
         [{ $match: { followerId: { $in: followers } } }],
         visitedProfileId,
         loggedInUserId
-      );
+      )
+      .then(results => {
+        resolve({ status: 'Success', follows: results });
+      })
+      .catch(error => {
+        console.log(error)
+      });
 
-      resolve({ status: 'Success', follows: results });
     } catch (error) {
       reject(error);
     }
@@ -217,15 +224,19 @@ Follow.getFollowing = (visitedProfileId, loggedInUserId) => {
       following = following.map(follow => {
         return follow.followedId;
       });
-
-      const results = await Follow.reUseableQuery(
+  
+      Follow.reUseableQuery(
         [{ $match: { followedId: { $in: following } } }],
         visitedProfileId,
         loggedInUserId,
         'following'
-      );
-
-      resolve({ status: 'Success', follows: results });
+      ).then(results => {
+        resolve({ status: 'Success', follows: results });
+      })
+      .catch(error => {
+        console.log(error)
+      });
+     
     } catch (error) {
       reject(error);
     }
@@ -233,7 +244,9 @@ Follow.getFollowing = (visitedProfileId, loggedInUserId) => {
 };
 
 Follow.cleanFollow = async (follow, loggedInUserId) => {
-  const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
+  // IF GUARD - IF FOLLOW IS NOT DELETED FROM DB BY CHANCE, THIS GUARD HELPS PREVENT A BUG
+  if(follow.author){
+    const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
     follow.author._id, // followedid
     loggedInUserId // followerid
   );
@@ -251,15 +264,16 @@ Follow.cleanFollow = async (follow, loggedInUserId) => {
   follow.loggedInUserFollowsVisited = loggedInUserFollowsVisited;
   follow.visitedUserFollowslogged = visitedUserFollowsLoggedIn;
 
-  follow.author = {
-    username: follow.author.username,
-    firstName: follow.author.firstName,
-    lastName: follow.author.lastName,
-    avatar: follow.author.avatar,
-    about: follow.author.about,
-  };
+   follow.author = {
+      username: follow.author.username,
+      firstName: follow.author.firstName,
+      lastName: follow.author.lastName,
+      avatar: follow.author.avatar,
+      about: follow.author.about,
+    };
 
-  return follow;
+    return follow;
+  }  
 };
 
 module.exports = Follow;
