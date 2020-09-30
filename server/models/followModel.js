@@ -156,6 +156,7 @@ Follow.reUseableQuery = function (uniqueOperations, visitedProfileId, loggedInUs
           if (new ObjectID(follow.followerId).equals(new ObjectID(visitedProfileId))) {
             try {
               follow = await Follow.cleanFollow(follow, loggedInUserId);
+
               return follow;
             } catch (error) {
               reject(error);
@@ -191,17 +192,13 @@ Follow.getFollowers = (visitedProfileId, loggedInUserId) => {
         return follow.followerId;
       });
 
-      Follow.reUseableQuery(
+      const results = await Follow.reUseableQuery(
         [{ $match: { followerId: { $in: followers } } }],
         visitedProfileId,
         loggedInUserId
-      )
-        .then(results => {
-          resolve({ status: 'Success', follows: results });
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      );
+
+      resolve({ status: 'Success', follows: results });
     } catch (error) {
       reject(error);
     }
@@ -221,18 +218,14 @@ Follow.getFollowing = (visitedProfileId, loggedInUserId) => {
         return follow.followedId;
       });
 
-      Follow.reUseableQuery(
+      const results = await Follow.reUseableQuery(
         [{ $match: { followedId: { $in: following } } }],
         visitedProfileId,
         loggedInUserId,
         'following'
-      )
-        .then(results => {
-          resolve({ status: 'Success', follows: results });
-        })
-        .catch(error => {
-          console.log(error);
-        });
+      );
+
+      resolve({ status: 'Success', follows: results });
     } catch (error) {
       reject(error);
     }
@@ -242,23 +235,25 @@ Follow.getFollowing = (visitedProfileId, loggedInUserId) => {
 Follow.cleanFollow = async (follow, loggedInUserId) => {
   // IF GUARD - IF FOLLOW IS NOT DELETED FROM DB BY CHANCE, THIS GUARD HELPS PREVENT A BUG
   if (follow.author) {
-    const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
-      follow.author._id, // followedid
-      loggedInUserId // followerid
-    );
+    if (loggedInUserId) {
+      const loggedInUserFollowsVisitedPromise = Follow.isUserFollowingVisitedProfile(
+        follow.author._id, // followedid
+        loggedInUserId // followerid
+      );
 
-    const visitedUserFollowsLoggedInPromise = Follow.isUserFollowingVisitedProfile(
-      loggedInUserId,
-      follow.author._id
-    );
+      const visitedUserFollowsLoggedInPromise = Follow.isUserFollowingVisitedProfile(
+        loggedInUserId,
+        follow.author._id
+      );
 
-    const [loggedInUserFollowsVisited, visitedUserFollowsLoggedIn] = await Promise.all([
-      loggedInUserFollowsVisitedPromise,
-      visitedUserFollowsLoggedInPromise,
-    ]);
+      const [loggedInUserFollowsVisited, visitedUserFollowsLoggedIn] = await Promise.all([
+        loggedInUserFollowsVisitedPromise,
+        visitedUserFollowsLoggedInPromise,
+      ]);
 
-    follow.loggedInUserFollowsVisited = loggedInUserFollowsVisited;
-    follow.visitedUserFollowslogged = visitedUserFollowsLoggedIn;
+      follow.loggedInUserFollowsVisited = loggedInUserFollowsVisited;
+      follow.visitedUserFollowslogged = visitedUserFollowsLoggedIn;
+    }
 
     follow.author = {
       username: follow.author.username,
