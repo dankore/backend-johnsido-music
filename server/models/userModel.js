@@ -422,5 +422,19 @@ User.isAdmin = username => {
   });
 };
 
+User.isAccountActive = username => {
+  return new Promise(async(resolve, reject)=>{
+    try{
+      const userDoc = await usersCollection.findOne({username});
+      if(userDoc.active){
+        resolve(userDoc)
+      } else {
+        resolve(null);
+      }
+    } catch(error){
+      reject(error)
+    }
+  })
+}
 // EXPORT CODE
 module.exports = User;
