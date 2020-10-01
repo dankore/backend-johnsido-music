@@ -426,10 +426,14 @@ User.isAccountActive = username => {
   return new Promise(async(resolve, reject)=>{
     try{
       const userDoc = await usersCollection.findOne({username});
-      if(userDoc.active){
-        resolve(userDoc)
-      } else {
+      if(userDoc){
+        if(userDoc.active){
+          resolve(userDoc)
+        } else {
         resolve(null);
+       }
+      } else {
+        resolve(['Invalid username / password']);
       }
     } catch(error){
       reject(error)
