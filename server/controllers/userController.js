@@ -252,23 +252,18 @@ exports.isAdmin = async (req, res, next) => {
 exports.isActive = async (req, res, next) => {
   try {
     const response = await User.isAccountActive(req.body.username);
-    
-    if(response == 'Active'){
+
+    if (response == 'Active') {
       next();
-    } else if(response == 'Inactive'){
+    } else if (response == 'Inactive') {
       res.json([
         'You account has been suspended. If this was an error, contact the admins or the developer at adamu.dankore@gmail.com to regain active status.',
       ]);
     } else {
       res.json(response);
     }
-   
-  } catch(error){
+  } catch (error) {
     console.log(error);
     res.json(error);
   }
-  
-} 
-
-
-
+};

@@ -423,19 +423,20 @@ User.isAdmin = username => {
 };
 
 User.isAccountActive = username => {
-  return new Promise(async(resolve, reject)=>{
-    usersCollection.findOne({username})
-    .then(userDoc => {
-      if(userDoc){
-        userDoc.active ? resolve('Active') : resolve('Inactive');
-      } else {
-        resolve(['Invalid username - password']);
-      }
-    })
-    .catch(error =>{
-      reject(error)
-    });
-  })
-}
+  return new Promise(async (resolve, reject) => {
+    usersCollection
+      .findOne({ username })
+      .then(userDoc => {
+        if (userDoc) {
+          userDoc.active ? resolve('Active') : resolve('Inactive');
+        } else {
+          resolve(['Invalid username / password']);
+        }
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
 // EXPORT CODE
 module.exports = User;
