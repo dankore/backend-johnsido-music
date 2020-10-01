@@ -11,7 +11,7 @@ apiRouter.post('/doesEmailExists', userController.apiDoesEmailExists);
 apiRouter.post('/doesUsernameExists', userController.apiDoesUsernameExists);
 
 // AUTH
-apiRouter.post('/login', userController.isActive, userController.apiLogin);
+apiRouter.post('/login', userController.apiLogin);
 
 // SETTINGS
 apiRouter.post(
