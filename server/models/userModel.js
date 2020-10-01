@@ -433,7 +433,7 @@ User.isAccountActive = username => {
         resolve(null);
        }
       } else {
-        resolve(['Invalid username / password']);
+        reject(['Invalid username / password']);
       }
     } catch(error){
       reject(error)
