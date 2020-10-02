@@ -266,7 +266,7 @@ exports.isActive = async (req, res, next) => {
       next();
     } else if (response == 'Inactive') {
       res.json([
-        'You account has been suspended. If this was an error, contact the admins or the developer at adamu.dankore@gmail.com to regain active status.',
+        'Your account has been suspended. If this was an error, contact the admins or the developer at adamu.dankore@gmail.com to regain active status.',
       ]);
     } else {
       res.json(response);
