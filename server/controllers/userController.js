@@ -249,18 +249,9 @@ exports.isAdmin = async (req, res, next) => {
   }
 };
 
-function extractUsername(usernameIsOnParamsObject, usernameIsOnBodyObject) {
-  return (
-    (usernameIsOnParamsObject && usernameIsOnParamsObject) ||
-    (usernameIsOnBodyObject && usernameIsOnBodyObject)
-  );
-}
-
 exports.isActive = async (req, res, next) => {
   try {
-    const response = await User.isAccountActive(
-      extractUsername(req.params.username, req.body.username)
-    );
+    const response = await User.isAccountActive(req.params.username || req.body.username);
 
     if (response == 'Active') {
       next();
