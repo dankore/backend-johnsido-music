@@ -67,13 +67,15 @@ apiRouter.post(
   adminController.apiGetAdminStats
 );
 apiRouter.post(
-  '/admin/:username/handleRoleAssignment',
+  '/admin/:username/userToAdmin_AdminToUser',
+  userController.isActive,
   userController.isLoggedIn,
   userController.isAdmin,
   adminController.apiHandleRoleAssignment
 );
 apiRouter.post(
-  '/admin/:username/handleBanUser',
+  '/admin/:username/activateDeactivateAccount',
+  userController.isActive,
   userController.isLoggedIn,
   userController.isAdmin,
   adminController.apiHandleBanUser
