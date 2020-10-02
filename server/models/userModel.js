@@ -137,7 +137,12 @@ User.prototype.validate = function (type) {
     if (this.data.password && this.data.password == '') {
       this.errors.push('You must provide a password.');
     }
-    if (this.data.password && this.data.password.length > 0 && this.data.password.length < 6) {
+    if (
+      type != 'login' &&
+      this.data.password &&
+      this.data.password.length > 0 &&
+      this.data.password.length < 6
+    ) {
       this.errors.push('Password must be at least 6 characters.');
     }
     if (this.data.confirmPassword && this.data.confirmPassword == '') {
@@ -148,10 +153,15 @@ User.prototype.validate = function (type) {
         this.errors.push('Passwords do not match.');
       }
     }
-    if (this.data.password && this.data.password.length > 50) {
+    if (type != 'login' && this.data.password && this.data.password.length > 50) {
       this.errors.push('Password cannot exceed 50 characters.');
     }
-    if (this.data.username && this.data.username.length > 0 && this.data.username.length < 3) {
+    if (
+      type != 'login' &&
+      this.data.username &&
+      this.data.username.length > 0 &&
+      this.data.username.length < 3
+    ) {
       this.errors.push('Username must be at least 3 characters.');
     }
     if (this.data.username && this.data.username.length > 30) {
@@ -233,7 +243,7 @@ User.prototype.register = function () {
 
 User.prototype.login = function () {
   return new Promise(async (resolve, reject) => {
-    await this.validate();
+    await this.validate('login');
     this.cleanUp('login');
 
     if (!this.errors.length) {
