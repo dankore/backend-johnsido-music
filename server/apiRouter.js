@@ -88,6 +88,7 @@ apiRouter.post(
 );
 apiRouter.post(
   '/admin/:username/uploadSong',
+  userController.isActive,
   userController.isLoggedIn,
   userController.isAdmin,
   adminController.apiUploadSong
