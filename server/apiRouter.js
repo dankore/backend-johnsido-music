@@ -60,9 +60,24 @@ apiRouter.post(
   userController.isUserRegistered,
   commentsController.apiFetchComments
 );
-apiRouter.post('/add-comment', userController.isLoggedIn, commentsController.apiAddComment);
-apiRouter.post('/delete-comment', userController.isLoggedIn, commentsController.apiDeleteComment);
-apiRouter.post('/edit-comment', userController.isLoggedIn, commentsController.apiEditComment);
+apiRouter.post(
+  '/add-comment',
+  userController.isLoggedIn,
+  userController.isActive,
+  commentsController.apiAddComment
+);
+apiRouter.post(
+  '/delete-comment',
+  userController.isLoggedIn,
+  userController.isActive,
+  commentsController.apiDeleteComment
+);
+apiRouter.post(
+  '/edit-comment',
+  userController.isLoggedIn,
+  userController.isActive,
+  commentsController.apiEditComment
+);
 
 // ADMIN
 apiRouter.post(
