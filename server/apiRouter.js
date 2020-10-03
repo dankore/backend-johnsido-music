@@ -31,10 +31,16 @@ apiRouter.post(
 );
 
 // FOLLOW
-apiRouter.post('/addFollow/:username', userController.isLoggedIn, followController.apiFollowUser);
+apiRouter.post(
+  '/addFollow/:username',
+  userController.isLoggedIn,
+  userController.isActive,
+  followController.apiFollowUser
+);
 apiRouter.post(
   '/stopFollowing/:username',
   userController.isLoggedIn,
+  userController.isActive,
   followController.apiStopFollowingUser
 );
 apiRouter.post(
@@ -68,15 +74,15 @@ apiRouter.post(
 );
 apiRouter.post(
   '/admin/:username/userToAdmin_AdminToUser',
-  userController.isActive,
   userController.isLoggedIn,
+  userController.isActive,
   userController.isAdmin,
   adminController.apiHandleRoleAssignment
 );
 apiRouter.post(
   '/admin/:username/activateDeactivateAccount',
-  userController.isActive,
   userController.isLoggedIn,
+  userController.isActive,
   userController.isAdmin,
   adminController.apiHandleBanUser
 );
@@ -88,8 +94,8 @@ apiRouter.post(
 );
 apiRouter.post(
   '/admin/:username/uploadSong',
-  userController.isActive,
   userController.isLoggedIn,
+  userController.isActive,
   userController.isAdmin,
   adminController.apiUploadSong
 );

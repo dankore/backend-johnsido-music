@@ -251,7 +251,8 @@ exports.isAdmin = async (req, res, next) => {
 
 exports.isActive = async (req, res, next) => {
   try {
-    const response = await User.isAccountActive(req.params.username || req.body.username);
+    const response = await User.isAccountActive(req.apiUser.username);
+
     response == 'Active' && next();
     response == 'Inactive' &&
       res.json([
@@ -259,7 +260,6 @@ exports.isActive = async (req, res, next) => {
       ]);
     response != 'Active' && response != 'Inactive' && res.json(response);
   } catch (error) {
-    console.log(error);
     res.json(error);
   }
 };
