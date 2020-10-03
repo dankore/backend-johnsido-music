@@ -440,7 +440,7 @@ User.isAccountActive = username => {
         if (userDoc) {
           userDoc.active ? resolve('Active') : resolve('Inactive');
         } else {
-          resolve(['Invalid username / password']);
+          resolve(['Invalid Credentials.']);
         }
       })
       .catch(error => {

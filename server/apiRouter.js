@@ -31,10 +31,16 @@ apiRouter.post(
 );
 
 // FOLLOW
-apiRouter.post('/addFollow/:username', userController.isLoggedIn, followController.apiFollowUser);
+apiRouter.post(
+  '/addFollow/:username',
+  userController.isLoggedIn,
+  userController.isActive,
+  followController.apiFollowUser
+);
 apiRouter.post(
   '/stopFollowing/:username',
   userController.isLoggedIn,
+  userController.isActive,
   followController.apiStopFollowingUser
 );
 apiRouter.post(
@@ -54,9 +60,24 @@ apiRouter.post(
   userController.isUserRegistered,
   commentsController.apiFetchComments
 );
-apiRouter.post('/add-comment', userController.isLoggedIn, commentsController.apiAddComment);
-apiRouter.post('/delete-comment', userController.isLoggedIn, commentsController.apiDeleteComment);
-apiRouter.post('/edit-comment', userController.isLoggedIn, commentsController.apiEditComment);
+apiRouter.post(
+  '/add-comment',
+  userController.isLoggedIn,
+  userController.isActive,
+  commentsController.apiAddComment
+);
+apiRouter.post(
+  '/delete-comment',
+  userController.isLoggedIn,
+  userController.isActive,
+  commentsController.apiDeleteComment
+);
+apiRouter.post(
+  '/edit-comment',
+  userController.isLoggedIn,
+  userController.isActive,
+  commentsController.apiEditComment
+);
 
 // ADMIN
 apiRouter.post(
@@ -67,14 +88,16 @@ apiRouter.post(
   adminController.apiGetAdminStats
 );
 apiRouter.post(
-  '/admin/:username/handleRoleAssignment',
+  '/admin/:username/userToAdmin_AdminToUser',
   userController.isLoggedIn,
+  userController.isActive,
   userController.isAdmin,
   adminController.apiHandleRoleAssignment
 );
 apiRouter.post(
-  '/admin/:username/handleBanUser',
+  '/admin/:username/activateDeactivateAccount',
   userController.isLoggedIn,
+  userController.isActive,
   userController.isAdmin,
   adminController.apiHandleBanUser
 );
@@ -87,6 +110,7 @@ apiRouter.post(
 apiRouter.post(
   '/admin/:username/uploadSong',
   userController.isLoggedIn,
+  userController.isActive,
   userController.isAdmin,
   adminController.apiUploadSong
 );
