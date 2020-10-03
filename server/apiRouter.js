@@ -11,15 +11,26 @@ apiRouter.post('/doesEmailExists', userController.apiDoesEmailExists);
 apiRouter.post('/doesUsernameExists', userController.apiDoesUsernameExists);
 
 // AUTH
-apiRouter.post('/login', userController.isActive, userController.apiLogin);
+apiRouter.post(
+  '/login',
+  userController.addApiUserObjectToReqBody,
+  userController.isActive,
+  userController.apiLogin
+);
 
 // SETTINGS
 apiRouter.post(
   '/saveUpdatedProfileInfo',
   userController.isLoggedIn,
+  userController.isActive,
   userController.apiSaveUpdatedProfileInfo
 );
-apiRouter.post('/change-password', userController.isLoggedIn, userController.apiChangePassword);
+apiRouter.post(
+  '/change-password',
+  userController.isLoggedIn,
+  userController.isActive,
+  userController.apiChangePassword
+);
 apiRouter.post('/delete-account', userController.isLoggedIn, userController.apiDeleteAccount);
 
 // PROFILE
