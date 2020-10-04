@@ -272,10 +272,8 @@ exports.isActive = async (req, res, next) => {
 };
 
 exports.apiCheckTokenExpiry = (req, res) => {
-  try {
-    req.apiUser = jwt.verify(req.body.token, process.env.JWTSECRET);
-    res.json(true);
-  } catch (error) {
-    res.json(false);
-  }
+  jwt.verify(req.body.token, process.env.JWTSECRET, (error, decoded) => {
+    decoded && res.json(true);
+    error && res.json(false);
+  });
 };
