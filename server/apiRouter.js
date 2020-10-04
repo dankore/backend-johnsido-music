@@ -17,6 +17,7 @@ apiRouter.post(
   userController.isActive,
   userController.apiLogin
 );
+apiRouter.post('/checkTokenExpiry', userController.apiCheckTokenExpiry);
 
 // SETTINGS
 apiRouter.post(
