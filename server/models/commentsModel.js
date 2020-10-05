@@ -96,6 +96,14 @@ Comments.prototype.validate = function (type) {
     if (this.data.comment == '') {
       this.errors.push('Comment field is empty.');
     }
+    if (
+      sanitizeHtml(this.data.comment.trim(), {
+        allowedTags: [],
+        allowedAttributes: {},
+      }) == ''
+    ) {
+      this.errors.push('Comment texts not allowed.');
+    }
     // CHECK FOR OWNERSHIP
     if (this.profileOwner && this.profileOwner != this.apiUser) {
       this.errors.push('You do not have the permission to perform that action.');
