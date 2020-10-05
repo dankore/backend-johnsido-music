@@ -1,6 +1,7 @@
 const commentsCollection = require('../../db').db().collection('comments');
 const usersCollection = require('../../db').db().collection('users');
 const { ObjectID } = require('mongodb');
+const sanitizeHtml = require('sanitize-html');
 
 const Comments = class comments {
   constructor(data) {
@@ -111,13 +112,26 @@ Comments.prototype.validate = function (type) {
     this.data = {
       ...(type == 'add' && { author: ObjectID(this.data.author) }),
       ...(type == 'add' && {
-        comment: [{ text: this.data.comment, createdDate: this.data.createdDate, edited: false }],
+        comment: [
+          {
+            text: sanitizeHtml(this.data.comment.trim(), {
+              allowedTags: [],
+              allowedAttributes: {},
+            }),
+            createdDate: this.data.createdDate,
+            edited: false,
+          },
+        ],
       }),
       ...(type == 'add' && { profileOwner: this.data.profileOwner }),
       ...(type == 'edit' && {
-        comment: { text: this.data.comment, createdDate: this.data.createdDate, edited: true },
+        comment: {
+          text: sanitizeHtml(this.data.comment.trim(), { allowedTags: [], allowedAttributes: {} }),
+          createdDate: this.data.createdDate,
+          edited: true,
+        },
       }),
-      ...(type == 'edit' && { commentId: this.data.commentId }),
+      ...(type == 'edit' && { commentId: ObjectID(this.data.commentId) }),
     };
 
     resolve();

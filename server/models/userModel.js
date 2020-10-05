@@ -87,14 +87,17 @@ User.prototype.cleanUp = function (type) {
           allowedAttributes: {},
         }),
 
-        email: this.data.email.trim().toLowerCase(),
+        email: sanitizeHTML(this.data.email.trim().toLowerCase(), {
+          allowedTags: [],
+          allowedAttributes: {},
+        }),
         userCreationDate: this.data.userCreationDate,
         verified: false,
         active: true,
         scope: ['user'],
         avatar:
           'https://res.cloudinary.com/my-nigerian-projects/image/upload/f_auto,q_auto/v1597076721/Others/john/default-avatar.jpg',
-        password: this.data.password,
+        password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
         about: {
           bio: '',
           city: '',
