@@ -439,7 +439,7 @@ User.isAdmin = username => {
   });
 };
 
-User.usernameOrEmail = uniqueUserProperty => {
+User.usernameOrEmail = (uniqueUserProperty = uniqueUserProperty.toLowerCase()) => {
   if (validator.isEmail(uniqueUserProperty)) {
     return { email: uniqueUserProperty };
   } else {
