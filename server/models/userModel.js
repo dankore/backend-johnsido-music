@@ -38,7 +38,7 @@ User.prototype.cleanUp = function (type) {
   switch (type) {
     case 'login':
       this.data = {
-        usernameOrEmail: sanitizeHTML(this.data.usernameOrEmail.trim().toLowerCase(), {
+        usernameOrEmail: sanitizeHTML(this.data.usernameOrEmail.trim(), {
           allowedTags: [],
           allowedAttributes: {},
         }),
@@ -439,8 +439,10 @@ User.isAdmin = username => {
   });
 };
 
-User.usernameOrEmail = (uniqueUserProperty = uniqueUserProperty.toLowerCase()) => {
-  if (validator.isEmail(uniqueUserProperty)) {
+User.usernameOrEmail = uniqueUserProperty => {
+  uniqueUserProperty = uniqueUserProperty.toLowerCase();
+
+  if (validator.isEmail(uniqueUserProperty.toLowerCase())) {
     return { email: uniqueUserProperty };
   } else {
     return { username: uniqueUserProperty };
