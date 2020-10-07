@@ -251,14 +251,15 @@ exports.isAdmin = async (req, res, next) => {
 
 exports.addApiUserObjectToReqBody = (req, res, next) => {
   req.apiUser = {};
-  req.apiUser.username = req.body.username;
+  req.apiUser.usernameOrEmail = req.body.usernameOrEmail;
 
   next();
 };
 
 exports.isActive = async (req, res, next) => {
   try {
-    const response = await User.isAccountActive(req.apiUser.username);
+    const uniqueUserProperty = req.apiUser.username || req.apiUser.usernameOrEmail;
+    const response = await User.isAccountActive(uniqueUserProperty);
 
     response == 'Active' && next();
     response == 'Inactive' &&
