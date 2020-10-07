@@ -23,7 +23,6 @@ apiRouter.post('/checkTokenExpiry', userController.apiCheckTokenExpiry);
 apiRouter.post(
   '/saveUpdatedProfileInfo',
   userController.isLoggedIn,
-  userController.isActive,
   userController.apiSaveUpdatedProfileInfo
 );
 apiRouter.post(
