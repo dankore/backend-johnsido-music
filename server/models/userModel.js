@@ -38,7 +38,7 @@ User.prototype.cleanUp = function (type) {
   switch (type) {
     case 'login':
       this.data = {
-        username: sanitizeHTML(this.data.username.trim().toLowerCase(), {
+        usernameOrEmail: sanitizeHTML(this.data.usernameOrEmail.trim().toLowerCase(), {
           allowedTags: [],
           allowedAttributes: {},
         }),
@@ -116,6 +116,10 @@ User.prototype.cleanUp = function (type) {
 
 User.prototype.validate = function (type) {
   return new Promise(async resolve => {
+    if (this.data.usernameOrEmail && this.data.usernameOrEmail == '') {
+      this.errors.push('Please enter your username or email.');
+    }
+
     if (this.data.username && this.data.username == '') {
       this.errors.push('You must provide a username.');
     }
@@ -251,7 +255,7 @@ User.prototype.login = function () {
 
     if (!this.errors.length) {
       usersCollection
-        .findOne({ username: this.data.username })
+        .findOne(User.usernameOrEmail(this.data.usernameOrEmail))
         .then(attemptedUser => {
           if (attemptedUser && bcrypt.compareSync(this.data.password, attemptedUser.password)) {
             this.data = attemptedUser;
@@ -435,10 +439,18 @@ User.isAdmin = username => {
   });
 };
 
-User.isAccountActive = username => {
+User.usernameOrEmail = uniqueUserProperty => {
+  if (validator.isEmail(uniqueUserProperty)) {
+    return { email: uniqueUserProperty };
+  } else {
+    return { username: uniqueUserProperty };
+  }
+};
+
+User.isAccountActive = uniqueUserProperty => {
   return new Promise(async (resolve, reject) => {
     usersCollection
-      .findOne({ username })
+      .findOne(User.usernameOrEmail(uniqueUserProperty))
       .then(userDoc => {
         if (userDoc) {
           userDoc.active ? resolve('Active') : resolve('Inactive');
