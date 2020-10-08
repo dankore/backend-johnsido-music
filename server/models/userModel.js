@@ -61,7 +61,10 @@ User.prototype.cleanUp = function (type) {
           allowedAttributes: {},
         }),
 
-        email: this.data.email.trim().toLowerCase(),
+        email: sanitizeHTML(this.data.email.trim().toLowerCase(), {
+          allowedTags: [],
+          allowedAttributes: {},
+        }),
         about: {
           bio: sanitizeHTML(this.data.about.bio, { allowedTags: [], allowedAttributes: {} }),
           city: sanitizeHTML(this.data.about.city, { allowedTags: [], allowedAttributes: {} }),
