@@ -25,6 +25,8 @@ MySongs.reUseableQuery = (uniqueOperations) => {
             songTitle: 1,
             songPostedDate: 1,
             songUrl: 1,
+            songCoverImage: 1,
+            songAlbumTitle: 1,
             author: {$arrayElemAt: ['$authorDoc', 0]},
           }
         }
