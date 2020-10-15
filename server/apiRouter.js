@@ -4,6 +4,7 @@ const userController = require('./controllers/userController');
 const followController = require('./controllers/followController');
 const commentsController = require('./controllers/commentsController');
 const adminController = require('./controllers/adminController');
+const mySongsController = require('./controllers/mySongsController');
 
 apiRouter.get('/', (req, res) => res.end('API - John Sido Music'));
 apiRouter.post('/register', userController.apiRegister);
@@ -125,5 +126,7 @@ apiRouter.post(
   userController.isAdmin,
   adminController.apiUploadSong
 );
+
+apiRouter.get('/my-songs', mySongsController.apiFetchMySongs)
 
 module.exports = apiRouter;
