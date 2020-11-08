@@ -477,38 +477,41 @@ User.isAccountActive = uniqueUserProperty => {
 
 User.prototype.resetPassword = function (url) {
   return new Promise(async (resolve, reject) => {
-    // VALIDATION CHECK
+     console.log(this.data);
     await this.validate("reset-password");
-    // CLEAN UP
     this.cleanUp('reset-password');
 
-    console.log(this.data);
+   
 
-    // if (!this.errors.length) {
-    //   const token = await User.cryptoRandomData();
-    //   const resetPasswordExpires = Date.now() + 3600000; // 1 HR EXPIRY
-    //   // ADD TOKEN AND EXPIRY TO DB
-    //   const response = await usersCollection.findOneAndUpdate(
-    //     { email: this.data.email },
-    //     {
-    //       $set: {
-    //         resetPasswordToken: token,
-    //         resetPasswordExpires: resetPasswordExpires,
-    //       },
-    //     },
-    //     {
-    //         projection: {
-    //             _id: 0,
-    //             firstName: 1
-    //         }
-    //     }
-    //   );
-    //   // SEND ATTEMPTED USER THE TOKEN
-    //   new Email().sendResetPasswordToken(this.data.email, response.value.firstName, url, token);
-    //   resolve('Success');
-    // } else {
-    //   reject(this.errors);
-    // }
+    if (!this.errors.length) {
+      const token = await User.cryptoRandomData();
+      const resetPasswordExpires = Date.now() + 3600000; // 1 HR EXPIRY
+      // ADD TOKEN AND EXPIRY TO DB
+      const response = await usersCollection.findOneAndUpdate(
+        { 
+          ...(this.data.type == "email" && { email: this.data.usernameOrEmail }), 
+          ...(this.data.type == "username" && { username: this.data.usernameOrEmail }), 
+        },
+        {
+          $set: {
+            resetPasswordToken: token,
+            resetPasswordExpires: resetPasswordExpires,
+          },
+        },
+        {
+            projection: {
+                _id: 0,
+                firstName: 1
+            }
+        }
+      );
+      // SEND ATTEMPTED USER THE TOKEN
+      // new Email().sendResetPasswordToken(this.data.email, response.value.firstName, url, token);
+      console.log(response.value);
+      resolve('Success');
+    } else {
+      reject(this.errors);
+    }
   });
 };
 
