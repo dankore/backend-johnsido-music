@@ -123,6 +123,11 @@ User.prototype.validate = function (type) {
     if (this.data.usernameOrEmail && this.data.usernameOrEmail == '') {
       this.errors.push('Please enter your username or email.');
     }
+    if (/@/.test(this.data.usernameOrEmail)) {
+      if (!validator.isEmail(this.data.usernameOrEmail)) {
+        this.errors.push('You must provide a valid email address.');
+      }
+    }
 
     if (this.data.username && this.data.username == '') {
       this.errors.push('You must provide a username.');
