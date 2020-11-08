@@ -278,3 +278,16 @@ exports.apiCheckTokenExpiry = (req, res) => {
     error && res.json(false);
   });
 };
+
+exports.apiResetPassword = (req, res) => {
+  let user = new User(req.body);
+
+  user
+    .resetPassword(req.headers.origin)
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
+}

@@ -6,6 +6,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { ObjectID } = require('mongodb');
 const sanitizeHTML = require('sanitize-html');
+const crypto = require('crypto');
 
 // CLASS
 let User = class user {
@@ -36,13 +37,13 @@ User.prototype.cleanUp = function (type) {
   }
   // GET RID OF BOGUS PROPERTIES with
   switch (type) {
-    case 'login':
+    case 'login': case 'reset-password':
       this.data = {
         usernameOrEmail: sanitizeHTML(this.data.usernameOrEmail.trim(), {
           allowedTags: [],
           allowedAttributes: {},
         }),
-        password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
+        ...(type == 'login' && {password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} })}),
       };
       break;
     case 'updateInfo':
@@ -466,6 +467,56 @@ User.isAccountActive = uniqueUserProperty => {
       .catch(error => {
         reject(error);
       });
+  });
+};
+
+User.prototype.resetPassword = function (url) {
+  return new Promise(async (resolve, reject) => {
+    // VALIDATION CHECK
+    await this.validate("reset-password");
+    // CLEAN UP
+    this.cleanUp('reset-password');
+
+    console.log(this.data);
+
+    // if (!this.errors.length) {
+    //   const token = await User.cryptoRandomData();
+    //   const resetPasswordExpires = Date.now() + 3600000; // 1 HR EXPIRY
+    //   // ADD TOKEN AND EXPIRY TO DB
+    //   const response = await usersCollection.findOneAndUpdate(
+    //     { email: this.data.email },
+    //     {
+    //       $set: {
+    //         resetPasswordToken: token,
+    //         resetPasswordExpires: resetPasswordExpires,
+    //       },
+    //     },
+    //     {
+    //         projection: {
+    //             _id: 0,
+    //             firstName: 1
+    //         }
+    //     }
+    //   );
+    //   // SEND ATTEMPTED USER THE TOKEN
+    //   new Email().sendResetPasswordToken(this.data.email, response.value.firstName, url, token);
+    //   resolve('Success');
+    // } else {
+    //   reject(this.errors);
+    // }
+  });
+};
+
+User.cryptoRandomData = () => {
+  return new Promise((resolve, reject) => {
+    crypto.randomBytes(20, (err, buffer) => {
+      if (buffer) {
+        var token = buffer.toString('hex');
+        resolve(token);
+      } else {
+        reject(err);
+      }
+    });
   });
 };
 // EXPORT CODE
