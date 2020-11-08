@@ -37,13 +37,16 @@ User.prototype.cleanUp = function (type) {
   }
   // GET RID OF BOGUS PROPERTIES with
   switch (type) {
-    case 'login': case 'reset-password':
+    case 'login':
+    case 'reset-password':
       this.data = {
         usernameOrEmail: sanitizeHTML(this.data.usernameOrEmail.trim(), {
           allowedTags: [],
           allowedAttributes: {},
         }),
-        ...(type == 'login' && {password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} })}),
+        ...(type == 'login' && {
+          password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
+        }),
       };
       break;
     case 'updateInfo':
@@ -475,22 +478,21 @@ User.isAccountActive = uniqueUserProperty => {
   });
 };
 
-User.prototype.resetPassword = function (url) {
+User.prototype.resetPassword = function () {
   return new Promise(async (resolve, reject) => {
-     console.log(this.data);
-    await this.validate("reset-password");
+    await this.validate('reset-password');
     this.cleanUp('reset-password');
-
-   
 
     if (!this.errors.length) {
       const token = await User.cryptoRandomData();
       const resetPasswordExpires = Date.now() + 3600000; // 1 HR EXPIRY
+
+      console.log({ resetPasswordToken: token, resetPasswordExpires: resetPasswordExpires });
       // ADD TOKEN AND EXPIRY TO DB
       const response = await usersCollection.findOneAndUpdate(
-        { 
-          ...(this.data.type == "email" && { email: this.data.usernameOrEmail }), 
-          ...(this.data.type == "username" && { username: this.data.usernameOrEmail }), 
+        {
+          ...(this.data.type == 'email' && { email: this.data.usernameOrEmail }),
+          ...(this.data.type == 'username' && { username: this.data.usernameOrEmail }),
         },
         {
           $set: {
@@ -499,16 +501,16 @@ User.prototype.resetPassword = function (url) {
           },
         },
         {
-            projection: {
-                _id: 0,
-                firstName: 1
-            }
+          projection: {
+            _id: 0,
+            firstName: 1,
+          },
         }
       );
       // SEND ATTEMPTED USER THE TOKEN
       // new Email().sendResetPasswordToken(this.data.email, response.value.firstName, url, token);
       console.log(response.value);
-      resolve('Success');
+      // resolve('Success');
     } else {
       reject(this.errors);
     }

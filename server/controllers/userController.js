@@ -290,4 +290,4 @@ exports.apiResetPassword = (req, res) => {
     .catch(error => {
       res.json(error);
     });
-}
+};

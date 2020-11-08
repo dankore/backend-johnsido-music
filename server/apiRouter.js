@@ -128,6 +128,6 @@ apiRouter.post(
   adminController.apiUploadSong
 );
 
-apiRouter.get('/my-songs', mySongsController.apiFetchMySongs)
+apiRouter.get('/my-songs', mySongsController.apiFetchMySongs);
 
 module.exports = apiRouter;
