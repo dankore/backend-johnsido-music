@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const { ObjectID } = require('mongodb');
 const sanitizeHTML = require('sanitize-html');
 const crypto = require('crypto');
+const Email = require("../emailNotification/Email");
 
 // CLASS
 let User = class user {
@@ -44,6 +45,7 @@ User.prototype.cleanUp = function (type) {
           allowedTags: [],
           allowedAttributes: {},
         }),
+        ...(type == "reset-password" && { type: this.data.type }),
         ...(type == 'login' && {
           password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
         }),
@@ -478,16 +480,16 @@ User.isAccountActive = uniqueUserProperty => {
   });
 };
 
-User.prototype.resetPassword = function () {
+User.prototype.resetPassword = function (url) {
   return new Promise(async (resolve, reject) => {
     await this.validate('reset-password');
     this.cleanUp('reset-password');
+    
 
     if (!this.errors.length) {
       const token = await User.cryptoRandomData();
       const resetPasswordExpires = Date.now() + 3600000; // 1 HR EXPIRY
 
-      console.log({ resetPasswordToken: token, resetPasswordExpires: resetPasswordExpires });
       // ADD TOKEN AND EXPIRY TO DB
       const response = await usersCollection.findOneAndUpdate(
         {
@@ -504,13 +506,14 @@ User.prototype.resetPassword = function () {
           projection: {
             _id: 0,
             firstName: 1,
+            email: 1,
           },
         }
       );
       // SEND ATTEMPTED USER THE TOKEN
-      // new Email().sendResetPasswordToken(this.data.email, response.value.firstName, url, token);
-      console.log(response.value);
-      // resolve('Success');
+      new Email().sendResetPasswordToken(response.value.email, response.value.firstName, url, token);
+
+      resolve('Success');
     } else {
       reject(this.errors);
     }
