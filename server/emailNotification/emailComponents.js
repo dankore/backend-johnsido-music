@@ -170,10 +170,10 @@ module.exports = {
                                                           out to me at
                                                         </span>
                                                         <a
-                                                          href="mailto:thebiddingapp@gmail.com."
+                                                          href="mailto:johnsido@gmail.com."
                                                           style="color:#ffffff;text-decoration:none;font-weight:normal"
                                                         >
-                                                          thebiddingapp@gmail.com
+                                                          johnsido@gmail.com
                                                         </a>
                                                       </td>
                                                     </tr>

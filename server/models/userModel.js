@@ -41,7 +41,7 @@ User.prototype.cleanUp = function (type) {
     case 'login':
     case 'reset-password':
       this.data = {
-        usernameOrEmail: sanitizeHTML(this.data.usernameOrEmail.trim(), {
+        usernameOrEmail: sanitizeHTML(this.data.usernameOrEmail.trim().toLowerCase(), {
           allowedTags: [],
           allowedAttributes: {},
         }),
@@ -290,22 +290,12 @@ User.prototype.login = function () {
 User.findByEmail = email => {
   return new Promise(async (resolve, reject) => {
     try {
+      email = email.toLowerCase();
       let response = await usersCollection.findOne({ email });
 
       if (response) {
         // CLEAN UP
-        response = {
-          _id: response._id,
-          username: response.username,
-          firstName: response.firstName,
-          lastName: response.lastName,
-          avatar: response.avatar,
-          email: response.email,
-          about: response.about,
-          verified: response.verified,
-          scope: response.scope,
-        };
-
+        response = User.cleanupResponse(response);
         resolve(response);
       } else {
         // USER DOES NOT EXISTS
@@ -316,6 +306,22 @@ User.findByEmail = email => {
     }
   });
 };
+
+User.cleanupResponse = response => {
+   response = {
+          _id: response._id,
+          username: response.username,
+          firstName: response.firstName,
+          lastName: response.lastName,
+          avatar: response.avatar,
+          email: response.email,
+          about: response.about,
+          verified: response.verified,
+          scope: response.scope,
+          active: response.active,
+        };
+        return response;
+}
 
 User.findByUsername = username => {
   return new Promise(async (resolve, reject) => {
@@ -511,8 +517,8 @@ User.prototype.resetPassword = function (url) {
         }
       );
       // SEND ATTEMPTED USER THE TOKEN
-      new Email().sendResetPasswordToken(response.value.email, response.value.firstName, url, token);
-
+      response.value && new Email().sendResetPasswordToken(response.value.email, response.value.firstName, url, token);
+  
       resolve('Success');
     } else {
       reject(this.errors);
@@ -532,5 +538,22 @@ User.cryptoRandomData = () => {
     });
   });
 };
+
+User.verifyPasswordResetToken = token => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await usersCollection.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: Date.now() },
+      });
+      
+      if (user) resolve('Success');
+      else reject('Password reset token is invalid or has expired. Please generate another token below.');
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 // EXPORT CODE
 module.exports = User;

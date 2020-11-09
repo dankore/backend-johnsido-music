@@ -20,6 +20,7 @@ apiRouter.post(
 );
 apiRouter.post('/checkTokenExpiry', userController.apiCheckTokenExpiry);
 apiRouter.post('/reset-password', userController.apiResetPassword);
+apiRouter.post("/verify-password-reset-token", userController.apiVerifyPasswordResetToken);
 
 // SETTINGS
 apiRouter.post(
