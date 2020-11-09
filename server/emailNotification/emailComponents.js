@@ -1,6 +1,6 @@
 module.exports = {
-    primaryEmail: "thebiddingapp@gmail.com",
-    emailHeader:`<table
+  primaryEmail: 'johnsido@gmail.com',
+  emailHeader: `<table
           align="center"
           border="0"
           cellpadding="0"
@@ -97,7 +97,7 @@ module.exports = {
                         </table>
                       </td>
                     </tr> `,
-      emailFooter: `
+  emailFooter: `
                     <tr>
                       <td
                         valign="top"
@@ -189,12 +189,11 @@ module.exports = {
                                                         ><br />
                                                         <span
                                                           style="color:#ffffff;text-decoration:none;font-weight:normal"
-                                                          >PO Box 511, Charles City,
-                                                          Iowa 50616
+                                                          >Abuja, Nigeria.
                                                         </span>
                                                         |
                                                         <a
-                                                          href="https://mailchimp.us1.list-manage.com/track/click?u=f7b9ee22124ff6454424dc10c&amp;id=aa0a7d260c&amp;e=dda3a809d4"
+                                                          href="https://john-sido.netlify.app"
                                                           style="color:#ffffff;text-decoration:none;font-weight:normal"
                                                           target="_blank"
                                                         >
@@ -249,5 +248,5 @@ module.exports = {
               </td>
             </tr>
           </tbody>
-        </table>`
+        </table>`,
 };

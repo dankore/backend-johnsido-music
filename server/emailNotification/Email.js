@@ -1,7 +1,6 @@
-
 const nodemailer = require('nodemailer');
 require('dotenv').config();
-const { primaryEmail, emailHeader, emailFooter } = require("./emailComponents");
+const { primaryEmail, emailHeader, emailFooter } = require('./emailComponents');
 
 let Email = class email {};
 
@@ -16,7 +15,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-transporter.verify((error) => {
+transporter.verify(error => {
   if (error) console.log(error);
   else console.log('Server is ready to take email messages');
 });
@@ -303,6 +302,5 @@ ${emailFooter}
     else console.log('Reset Password Success Sent Via Email: ' + info.response);
   });
 };
-
 
 module.exports = Email;

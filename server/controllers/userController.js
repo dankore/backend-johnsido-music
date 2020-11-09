@@ -300,4 +300,4 @@ exports.apiVerifyPasswordResetToken = (req, res) => {
     .catch(error => {
       res.json(error);
     });
-}
+};

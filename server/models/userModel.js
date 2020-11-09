@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 const { ObjectID } = require('mongodb');
 const sanitizeHTML = require('sanitize-html');
 const crypto = require('crypto');
-const Email = require("../emailNotification/Email");
+const Email = require('../emailNotification/Email');
 
 // CLASS
 let User = class user {
@@ -45,7 +45,7 @@ User.prototype.cleanUp = function (type) {
           allowedTags: [],
           allowedAttributes: {},
         }),
-        ...(type == "reset-password" && { type: this.data.type }),
+        ...(type == 'reset-password' && { type: this.data.type }),
         ...(type == 'login' && {
           password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
         }),
@@ -308,20 +308,20 @@ User.findByEmail = email => {
 };
 
 User.cleanupResponse = response => {
-   response = {
-          _id: response._id,
-          username: response.username,
-          firstName: response.firstName,
-          lastName: response.lastName,
-          avatar: response.avatar,
-          email: response.email,
-          about: response.about,
-          verified: response.verified,
-          scope: response.scope,
-          active: response.active,
-        };
-        return response;
-}
+  response = {
+    _id: response._id,
+    username: response.username,
+    firstName: response.firstName,
+    lastName: response.lastName,
+    avatar: response.avatar,
+    email: response.email,
+    about: response.about,
+    verified: response.verified,
+    scope: response.scope,
+    active: response.active,
+  };
+  return response;
+};
 
 User.findByUsername = username => {
   return new Promise(async (resolve, reject) => {
@@ -490,7 +490,6 @@ User.prototype.resetPassword = function (url) {
   return new Promise(async (resolve, reject) => {
     await this.validate('reset-password');
     this.cleanUp('reset-password');
-    
 
     if (!this.errors.length) {
       const token = await User.cryptoRandomData();
@@ -517,8 +516,14 @@ User.prototype.resetPassword = function (url) {
         }
       );
       // SEND ATTEMPTED USER THE TOKEN
-      response.value && new Email().sendResetPasswordToken(response.value.email, response.value.firstName, url, token);
-  
+      response.value &&
+        new Email().sendResetPasswordToken(
+          response.value.email,
+          response.value.firstName,
+          url,
+          token
+        );
+
       resolve('Success');
     } else {
       reject(this.errors);
@@ -546,9 +551,12 @@ User.verifyPasswordResetToken = token => {
         resetPasswordToken: token,
         resetPasswordExpires: { $gt: Date.now() },
       });
-      
+
       if (user) resolve('Success');
-      else reject('Password reset token is invalid or has expired. Please generate another token below.');
+      else
+        reject(
+          'Password reset token is invalid or has expired. Please generate another token below.'
+        );
     } catch (error) {
       reject(error);
     }
