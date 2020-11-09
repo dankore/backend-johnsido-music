@@ -74,8 +74,8 @@ module.exports = {
                                         style="padding-right:0px;padding-left:0px;padding-top:0;padding-bottom:0;text-align:center"
                                       >
                                         <a
-                                          href="https://mynigerianprojects.com"
-                                          title="My Nigerian Projects"
+                                          href="https://john-sido.netlify.app/"
+                                          title="Johnsido Music"
                                           target="_blank"
                                         >
                                           <img
@@ -164,8 +164,7 @@ module.exports = {
                                                           target="_blank"
                                                           >You're receiving this
                                                           email because you are a
-                                                          member of My Nigerian
-                                                          Projects. If you prefer
+                                                          member of Johnsido Music. If you prefer
                                                           not to be included in
                                                           future emails please reach
                                                           out to me at
@@ -186,8 +185,7 @@ module.exports = {
                                                         valign="top"
                                                       >
                                                         <strong
-                                                          >©2020 My Nigerian
-                                                          Projects</strong
+                                                          >©2020 Johnsido Music</strong
                                                         ><br />
                                                         <span
                                                           style="color:#ffffff;text-decoration:none;font-weight:normal"
@@ -200,7 +198,7 @@ module.exports = {
                                                           style="color:#ffffff;text-decoration:none;font-weight:normal"
                                                           target="_blank"
                                                         >
-                                                          mynigerianprojects.com
+                                                          john-sido.netlify.app
                                                         </a>
                                                       </td>
                                                     </tr>
@@ -214,14 +212,14 @@ module.exports = {
                                                           style="color:#ffffff;font-family:'Helvetica Neue',Helvetica,Arial,Verdana,sans-serif;font-size:16px;margin:10px 0;padding:0;line-height:150%;text-align:center"
                                                         >
                                                           <a
-                                                            href="https://mynigerianprojects.com/terms"
+                                                            href="https://john-sido.netlify.app/terms"
                                                             style="color:#ffffff;text-decoration:underline;font-weight:normal"
                                                             target="_blank"
                                                           >
                                                             Terms of Use </a
                                                           >•
                                                           <a
-                                                            href="https://mynigerianprojects.com/privacy"
+                                                            href="https://john-sido.netlify.app/privacy"
                                                             style="color:#ffffff;text-decoration:underline;font-weight:normal"
                                                             target="_blank"
                                                           >
