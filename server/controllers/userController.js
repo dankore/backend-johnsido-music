@@ -281,7 +281,7 @@ exports.apiCheckTokenExpiry = (req, res) => {
 
 exports.apiResetPasswordStep1 = (req, res) => {
   let user = new User(req.body);
-
+ 
   user
     .resetPasswordStep1(req.headers.origin)
     .then(response => {

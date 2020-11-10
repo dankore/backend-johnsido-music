@@ -105,7 +105,7 @@ Email.prototype.sendResetPasswordToken = (email, firstName, url, token) => {
                             valign="top"
                           >
                            <p>Paste the URL below into your browser to complete the process:</p>
-                              ${url}/reset-password/${token} 
+                              ${url}/reset-password-step-2/${token} 
                           </td>
                           <tr>
                           <td
