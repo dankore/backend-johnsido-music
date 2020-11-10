@@ -39,13 +39,13 @@ User.prototype.cleanUp = function (type) {
   // GET RID OF BOGUS PROPERTIES with
   switch (type) {
     case 'login':
-    case 'reset-password':
+    case 'reset-password-step-1':
       this.data = {
         usernameOrEmail: sanitizeHTML(this.data.usernameOrEmail.trim().toLowerCase(), {
           allowedTags: [],
           allowedAttributes: {},
         }),
-        ...(type == 'reset-password' && { type: this.data.type }),
+        ...(type == 'reset-password-step-1' && { type: this.data.type }),
         ...(type == 'login' && {
           password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
         }),
@@ -115,9 +115,11 @@ User.prototype.cleanUp = function (type) {
       };
       break;
     case 'changePassword':
+    case 'reset-password-step-2':
       this.data = {
-        _id: ObjectID(this.data._id),
+        ...(type == "changePassword" && { _id: ObjectID(this.data._id) }),
         password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
+        ...(type == "reset-password-step-2" && {token: this.data.token}),
       };
       break;
   }
@@ -486,10 +488,10 @@ User.isAccountActive = uniqueUserProperty => {
   });
 };
 
-User.prototype.resetPassword = function (url) {
+User.prototype.resetPasswordStep1 = function (url) {
   return new Promise(async (resolve, reject) => {
-    await this.validate('reset-password');
-    this.cleanUp('reset-password');
+    await this.validate('reset-password-step-1');
+    this.cleanUp('reset-password-step-1');
 
     if (!this.errors.length) {
       const token = await User.cryptoRandomData();
@@ -557,6 +559,64 @@ User.verifyPasswordResetToken = token => {
         reject(
           'Password reset token is invalid or has expired. Please generate another token below.'
         );
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+User.prototype.resetPasswordStep2 = function () {
+  return new Promise(async (resolve, reject) => {
+    await this.validate('reset-password-step-2');
+    this.cleanUp('reset-password-step-2');
+
+    if (!this.errors.length) {
+      const response = await User.verifyPasswordResetToken(this.data.token);
+
+      if (response != 'Success') {
+        reject('Password reset token is invalid or has expired. Please generate another token below.');
+        return;
+      } else {
+        // HASH PASSWORD
+        const salt = bcrypt.genSaltSync();
+        this.data.password = bcrypt.hashSync(this.data.password, salt);
+
+        // REPLACE NEW PASSWORD WITH OLD
+        const status = await this.replaceOldPasswordWithNew();
+        resolve(status);
+      }
+    } else {
+      reject(this.errors);
+    }
+  });
+};
+
+User.prototype.replaceOldPasswordWithNew = function () {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await usersCollection.findOneAndUpdate(
+        { resetPasswordToken: this.data.token },
+        {
+          $set: {
+            password: this.data.password,
+            resetPasswordToken: null,
+            resetPasswordExpires: null,
+          },
+        },
+        {
+          projection: {
+            _id: 0,
+            firstName: 1,
+            lastName: 1,
+            email: 1,
+          },
+          returnOriginal: false,
+        }
+      );
+
+      resolve('Success');
+
+      // new Email().sendResetPasswordSuccess(user.value);
     } catch (error) {
       reject(error);
     }
