@@ -6,6 +6,8 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const { ObjectID } = require('mongodb');
 const sanitizeHTML = require('sanitize-html');
+const crypto = require('crypto');
+const Email = require('../emailNotification/Email');
 
 // CLASS
 let User = class user {
@@ -37,12 +39,16 @@ User.prototype.cleanUp = function (type) {
   // GET RID OF BOGUS PROPERTIES with
   switch (type) {
     case 'login':
+    case 'reset-password-step-1':
       this.data = {
-        usernameOrEmail: sanitizeHTML(this.data.usernameOrEmail.trim(), {
+        usernameOrEmail: sanitizeHTML(this.data.usernameOrEmail.trim().toLowerCase(), {
           allowedTags: [],
           allowedAttributes: {},
         }),
-        password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
+        ...(type == 'reset-password-step-1' && { type: this.data.type }),
+        ...(type == 'login' && {
+          password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
+        }),
       };
       break;
     case 'updateInfo':
@@ -109,9 +115,11 @@ User.prototype.cleanUp = function (type) {
       };
       break;
     case 'changePassword':
+    case 'reset-password-step-2':
       this.data = {
-        _id: ObjectID(this.data._id),
+        ...(type == "changePassword" && { _id: ObjectID(this.data._id) }),
         password: sanitizeHTML(this.data.password, { allowedTags: [], allowedAttributes: {} }),
+        ...(type == "reset-password-step-2" && {token: this.data.token}),
       };
       break;
   }
@@ -121,6 +129,11 @@ User.prototype.validate = function (type) {
   return new Promise(async resolve => {
     if (this.data.usernameOrEmail && this.data.usernameOrEmail == '') {
       this.errors.push('Please enter your username or email.');
+    }
+    if (/@/.test(this.data.usernameOrEmail)) {
+      if (!validator.isEmail(this.data.usernameOrEmail)) {
+        this.errors.push('You must provide a valid email address.');
+      }
     }
 
     if (this.data.username && this.data.username == '') {
@@ -279,22 +292,12 @@ User.prototype.login = function () {
 User.findByEmail = email => {
   return new Promise(async (resolve, reject) => {
     try {
+      email = email.toLowerCase();
       let response = await usersCollection.findOne({ email });
 
       if (response) {
         // CLEAN UP
-        response = {
-          _id: response._id,
-          username: response.username,
-          firstName: response.firstName,
-          lastName: response.lastName,
-          avatar: response.avatar,
-          email: response.email,
-          about: response.about,
-          verified: response.verified,
-          scope: response.scope,
-        };
-
+        response = User.cleanupResponse(response);
         resolve(response);
       } else {
         // USER DOES NOT EXISTS
@@ -304,6 +307,22 @@ User.findByEmail = email => {
       reject(error);
     }
   });
+};
+
+User.cleanupResponse = response => {
+  response = {
+    _id: response._id,
+    username: response.username,
+    firstName: response.firstName,
+    lastName: response.lastName,
+    avatar: response.avatar,
+    email: response.email,
+    about: response.about,
+    verified: response.verified,
+    scope: response.scope,
+    active: response.active,
+  };
+  return response;
 };
 
 User.findByUsername = username => {
@@ -468,5 +487,141 @@ User.isAccountActive = uniqueUserProperty => {
       });
   });
 };
+
+User.prototype.resetPasswordStep1 = function (url) {
+  return new Promise(async (resolve, reject) => {
+    await this.validate('reset-password-step-1');
+    this.cleanUp('reset-password-step-1');
+
+    if (!this.errors.length) {
+      const token = await User.cryptoRandomData();
+      const resetPasswordExpires = Date.now() + 3600000; // 1 HR EXPIRY
+
+      // ADD TOKEN AND EXPIRY TO DB
+      const response = await usersCollection.findOneAndUpdate(
+        {
+          ...(this.data.type == 'email' && { email: this.data.usernameOrEmail }),
+          ...(this.data.type == 'username' && { username: this.data.usernameOrEmail }),
+        },
+        {
+          $set: {
+            resetPasswordToken: token,
+            resetPasswordExpires: resetPasswordExpires,
+          },
+        },
+        {
+          projection: {
+            _id: 0,
+            firstName: 1,
+            email: 1,
+          },
+        }
+      );
+      // SEND ATTEMPTED USER THE TOKEN
+      response.value &&
+        new Email().sendResetPasswordToken(
+          response.value.email,
+          response.value.firstName,
+          url,
+          token
+        );
+
+      resolve('Success');
+    } else {
+      reject(this.errors);
+    }
+  });
+};
+
+User.cryptoRandomData = () => {
+  return new Promise((resolve, reject) => {
+    crypto.randomBytes(20, (err, buffer) => {
+      if (buffer) {
+        var token = buffer.toString('hex');
+        resolve(token);
+      } else {
+        reject(err);
+      }
+    });
+  });
+};
+
+User.verifyPasswordResetToken = token => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await usersCollection.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: Date.now() },
+      });
+
+      if (user) resolve('Success');
+      else
+        reject(
+          'Password reset token is invalid or has expired. Please generate another token below.'
+        );
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+User.prototype.resetPasswordStep2 = function () {
+  return new Promise(async (resolve, reject) => {
+    await this.validate('reset-password-step-2');
+    this.cleanUp('reset-password-step-2');
+
+    if (!this.errors.length) {
+      const response = await User.verifyPasswordResetToken(this.data.token);
+
+      if (response != 'Success') {
+        reject('Password reset token is invalid or has expired. Please generate another token below.');
+        return;
+      } else {
+        // HASH PASSWORD
+        const salt = bcrypt.genSaltSync();
+        this.data.password = bcrypt.hashSync(this.data.password, salt);
+
+        // REPLACE NEW PASSWORD WITH OLD
+        const status = await this.replaceOldPasswordWithNew();
+        resolve(status);
+      }
+    } else {
+      reject(this.errors);
+    }
+  });
+};
+
+User.prototype.replaceOldPasswordWithNew = function () {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let user = await usersCollection.findOneAndUpdate(
+        { resetPasswordToken: this.data.token },
+        {
+          $set: {
+            password: this.data.password,
+            resetPasswordToken: null,
+            resetPasswordExpires: null,
+          },
+        },
+        {
+          projection: {
+            _id: 0,
+            firstName: 1,
+            lastName: 1,
+            email: 1,
+          },
+          returnOriginal: false,
+        }
+      );
+
+      resolve('Success');
+
+      // new Email().sendResetPasswordSuccess(user.value);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 // EXPORT CODE
 module.exports = User;

@@ -19,6 +19,10 @@ apiRouter.post(
   userController.apiLogin
 );
 apiRouter.post('/checkTokenExpiry', userController.apiCheckTokenExpiry);
+apiRouter.post('/reset-password-step-1', userController.apiResetPasswordStep1); // GENERATE TOKEN
+apiRouter.post('/verify-password-reset-token', userController.apiVerifyPasswordResetToken);
+apiRouter.post('/reset-password-step-2', userController.apiResetPasswordStep2); // CHANGE PASSWORD
+
 
 // SETTINGS
 apiRouter.post(
@@ -127,6 +131,6 @@ apiRouter.post(
   adminController.apiUploadSong
 );
 
-apiRouter.get('/my-songs', mySongsController.apiFetchMySongs)
+apiRouter.get('/my-songs', mySongsController.apiFetchMySongs);
 
 module.exports = apiRouter;

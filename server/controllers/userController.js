@@ -278,3 +278,38 @@ exports.apiCheckTokenExpiry = (req, res) => {
     error && res.json(false);
   });
 };
+
+exports.apiResetPasswordStep1 = (req, res) => {
+  let user = new User(req.body);
+ 
+  user
+    .resetPasswordStep1(req.headers.origin)
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
+};
+
+exports.apiVerifyPasswordResetToken = (req, res) => {
+  User.verifyPasswordResetToken(req.body.passwordResetToken)
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
+};
+
+exports.apiResetPasswordStep2 = (req, res) => {
+  let user = new User(req.body);
+  user
+    .resetPasswordStep2()
+    .then(response => {
+      res.json(response);
+    })
+    .catch(error => {
+      res.json(error);
+    });
+};
