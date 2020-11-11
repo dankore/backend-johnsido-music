@@ -1,5 +1,5 @@
 module.exports = {
-  primaryEmail: 'mynigerianprojects@yahoo.com',
+  primaryEmail: 'johnsidomusic@yahoo.com',
   emailHeader: `<table
           align="center"
           border="0"
