@@ -5,9 +5,10 @@ const { primaryEmail, emailHeader, emailFooter } = require('./emailComponents');
 let Email = class email {};
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
+  host: 'smtp.mail.yahoo.com',
+  port: 465,
   ignoreTLS: false,
+  service:'yahoo',
   secure: false,
   auth: {
     user: `${primaryEmail}`,
