@@ -173,7 +173,7 @@ Email.prototype.sendResetPasswordSuccess = function () {
   const message = {
     from: `"Johnsido Music" <${primaryEmail}>`,
      to: `"${this.data.firstName} ${this.data.lastName}" <${this.data.email}>` ,
-    subject: `${this.data.firstName}, You Have Successfully Changed Your Password | Johnsido Music`,
+    subject: `${this.data.firstName}, You Have Successfully Reset Your Password | Johnsido Music`,
     html: `${emailHeader}
     <tr>
   <td
