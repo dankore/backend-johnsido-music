@@ -156,6 +156,9 @@ User.prototype.validate = function (type) {
       if (!validator.isEmail(this.data.email)) {
         this.errors.push('You must provide a valid email address.');
       }
+      if (this.data.email.split("@")[0].length > 100) {
+        this.errors.push('Email cannot exceed 100 characters.');
+      }
     }
     if (this.data.password && this.data.password == '') {
       this.errors.push('You must provide a password.');
