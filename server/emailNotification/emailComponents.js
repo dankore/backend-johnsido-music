@@ -1,5 +1,5 @@
 module.exports = {
-  primaryEmail: 'thebiddingapp@gmail.com',
+  primaryEmail: 'mynigerianprojects@yahoo.com',
   emailHeader: `<table
           align="center"
           border="0"
