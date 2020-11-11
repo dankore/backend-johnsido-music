@@ -81,7 +81,6 @@ module.exports = {
                                             align="center"
                                             alt="headerPic"
                                             src="https://res.cloudinary.com/my-nigerian-projects/image/upload/c_fill,g_auto,h_250,w_970/b_rgb:000000,e_gradient_fade,y_-0.50/c_scale,co_rgb:ffffff,fl_relative,l_text:montserrat_25_style_light_align_center:Johnsido%20Music,w_0.5,y_0.18/v1605073737/email-header.jpg"
-                                            height="250"
                                             style="max-width:1200px;padding-bottom:0;display:inline!important;vertical-align:bottom;border:0;height:150px;outline:none;text-decoration:none"
                                           />
                                         </a>
