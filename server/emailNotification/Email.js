@@ -2,7 +2,11 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 const { primaryEmail, emailHeader, emailFooter } = require('./emailComponents');
 
-let Email = class email {};
+let Email = class email {
+  constructor(data){
+    this.data = data;
+  }
+};
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.mail.yahoo.com',
@@ -18,14 +22,14 @@ const transporter = nodemailer.createTransport({
 
 transporter.verify(error => {
   if (error) console.log(error);
-  else console.log('Server is ready to take email messages');
+  else console.log('Server is ready to take email messages.');
 });
 
-Email.prototype.sendResetPasswordToken = (email, firstName, url, token) => {
-  const data = {
-    from: `"johnsido Music" <${primaryEmail}>`,
-    to: email,
-    subject: `${firstName}, Reset Your Password | johnsido Music`,
+Email.prototype.sendResetPasswordToken = function (url, token){
+  const message = {
+    from: `"Johnsido Music" <${primaryEmail}>`,
+    to: `"${this.data.firstName} ${this.data.lastName}" <${this.data.email}>` ,
+    subject: `${this.data.firstName}, Reset Your Password | Johnsido Music`,
     html: `${emailHeader}
 <tr>
   <td
@@ -89,7 +93,7 @@ Email.prototype.sendResetPasswordToken = (email, firstName, url, token) => {
                             valign="top"
                             style="padding:18px;color:#241c15;font-family:Helvetica;font-size:20px;font-weight:normal;text-align:left;word-break:break-word;line-height:150%"
                           >
-                            <h2>Hello ${firstName},</h2>
+                            <h2>Hello ${this.data.firstName},</h2>
                               Please click on the following link to complete the process:
                               <a href='${url}/reset-password-step-2/${token}'>Reset your password</a><br>
                           </td>
@@ -159,17 +163,17 @@ Email.prototype.sendResetPasswordToken = (email, firstName, url, token) => {
 </tr>
     ${emailFooter}`,
   };
-  transporter.sendMail(data, (err, info) => {
+  transporter.sendMail(message, (err, info) => {
     if (err) console.log(err);
     else console.log('Reset Password Token Sent Via Email: ' + info.response);
   });
 };
 
-Email.prototype.sendResetPasswordSuccess = ({ firstName, email }) => {
-  const data = {
+Email.prototype.sendResetPasswordSuccess = function () {
+  const message = {
     from: `"Johnsido Music" <${primaryEmail}>`,
-    to: email,
-    subject: `${firstName}, You Have Successfully Changed Your Password | johnsido Music`,
+     to: `"${this.data.firstName} ${this.data.lastName}" <${this.data.email}>` ,
+    subject: `${this.data.firstName}, You Have Successfully Changed Your Password | Johnsido Music`,
     html: `${emailHeader}
     <tr>
   <td
@@ -232,7 +236,7 @@ Email.prototype.sendResetPasswordSuccess = ({ firstName, email }) => {
                             valign="top"
                             style="padding:18px;color:#241c15;font-family:Helvetica;font-size:20px;font-weight:normal;text-align:left;word-break:break-word;line-height:150%"
                           >
-                            <h2>Hello ${firstName},</h2>
+                            <h2>Hello ${this.data.firstName},</h2>
                               You have successfully reset your password.
                           </td>
                         </tr>
@@ -249,7 +253,7 @@ Email.prototype.sendResetPasswordSuccess = ({ firstName, email }) => {
                             style="padding:18px;color:#241c15;font-family:Helvetica;font-size:20px;font-weight:normal;text-align:left;word-break:break-word;line-height:150%"
                             valign="top"
                           >
-                             <a href='https://mynigerianprojects.com/reset-password' style='background:#0060df;color:#fff;text-decoration:none;border:14px solid #0060df;border-left-width:50px;border-right-width:50px;display:inline-block' target='_blank'>
+                             <a href='https://john-sido.netlify.app/reset-password-step-1' style='background:#0060df;color:#fff;text-decoration:none;border:14px solid #0060df;border-left-width:50px;border-right-width:50px;display:inline-block' target='_blank'>
                                  Secure My Account Now
                                 </a>
                            </td>
@@ -298,7 +302,7 @@ Email.prototype.sendResetPasswordSuccess = ({ firstName, email }) => {
 ${emailFooter}
           `,
   };
-  transporter.sendMail(data, (err, info) => {
+  transporter.sendMail(message, (err, info) => {
     if (err) console.log(err);
     else console.log('Reset Password Success Sent Via Email: ' + info.response);
   });

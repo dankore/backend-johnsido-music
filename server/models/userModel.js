@@ -513,15 +513,14 @@ User.prototype.resetPasswordStep1 = function (url) {
           projection: {
             _id: 0,
             firstName: 1,
+            lastName: 1,
             email: 1,
           },
         }
       );
       // SEND ATTEMPTED USER THE TOKEN
       response.value &&
-        new Email().sendResetPasswordToken(
-          response.value.email,
-          response.value.firstName,
+        new Email(response.value).sendResetPasswordToken(
           url,
           token
         );
@@ -594,7 +593,7 @@ User.prototype.resetPasswordStep2 = function () {
 User.prototype.replaceOldPasswordWithNew = function () {
   return new Promise(async (resolve, reject) => {
     try {
-      let user = await usersCollection.findOneAndUpdate(
+      let response = await usersCollection.findOneAndUpdate(
         { resetPasswordToken: this.data.token },
         {
           $set: {
@@ -615,8 +614,8 @@ User.prototype.replaceOldPasswordWithNew = function () {
       );
 
       resolve('Success');
-
-      // new Email().sendResetPasswordSuccess(user.value);
+      // SEND SUCCESS EMAIL
+      new Email(response.value).sendResetPasswordSuccess();
     } catch (error) {
       reject(error);
     }
